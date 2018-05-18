@@ -323,10 +323,6 @@ public class PredicIO {
         }
     }
 
-    private String getIdentity() {
-        return identity;
-    }
-
     private double getDistance(double lat1, double lng1, double lat2, double lng2) {
         double earthRadius = 6371; // in km, change to 3958.75 for miles output
 
