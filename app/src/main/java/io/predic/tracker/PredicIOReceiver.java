@@ -31,11 +31,11 @@ public class PredicIOReceiver extends BroadcastReceiver {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         String apiKey = settings.getString("api_key", null);
         String identity = settings.getString("predicio_identity", null);
-
+        Log.d("PREDICIO","onReceive 3" + intent.getAction());
         PredicIO.getInstance().setApiKey(context, apiKey);
+        Log.d("PREDICIO","onReceive 4" + intent.getAction());
         PredicIO.getInstance().setIdentity(context, identity);
-
-        Log.d("PREDICIO", intent.getAction());
+        Log.d("PREDICIO","onReceive 5" + intent.getAction());
 
         if (intent.getAction().equals(PredicIO.ACTION_TRACK_APPS)) {
             JSONObject obj = PredicIO.getInstance().getJSONObjectApps(context);
