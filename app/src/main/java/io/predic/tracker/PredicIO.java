@@ -107,11 +107,10 @@ public class PredicIO {
     }
 
     public void improveTrackingLocation(Context context) {
-        Log.d("Predicio","improveTrackingLocation");
+        Log.d("PREDICIO","improveTrackingLocation");
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            Log.d("Predicio","improveTrackingLocation GRANTED");
 
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context.getApplicationContext());
             mLocationCallback = new LocationCallback() {
@@ -190,17 +189,38 @@ public class PredicIO {
     /* Start tracking */
 
     public void startTrackingLocation(Activity activity) {
-        Context context = activity.getApplicationContext();
+        final Context context = activity.getApplicationContext();
 
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        } else {
-            improveTrackingLocation(activity);
         }
 
-        startCheckingPermissionTask(context);
+        //checkingPermission
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+
+                if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                    this.cancel();
+
+                    //launch services
+                    FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
+                        @Override
+                        public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
+                        AAID = advertisingInfo.getId();
+                        startService(context, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
+                        improveTrackingLocation(context);
+                        }
+                    });
+                    task.execute();
+
+                }
+            }
+        }, 5 * 1000, 5 * 1000);
     }
 
     public void startTrackingApps(final Context context) {
@@ -377,33 +397,6 @@ public class PredicIO {
         }
 
         return obj;
-    }
-
-    private void startCheckingPermissionTask(final Context context) {
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-
-                if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                    onPermissionGranted(context);
-                    this.cancel();
-                }
-            }
-        }, 5 * 1000, 5 * 1000);
-    }
-
-    void onPermissionGranted(final Context context) {
-        FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
-            @Override
-            public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
-                AAID = advertisingInfo.getId();
-                startService(context, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
-            }
-        });
-
-        task.execute();
     }
 
     private void showDialog(String title, String message, final Activity activity, final HttpRequestResponseCallback callback) {
