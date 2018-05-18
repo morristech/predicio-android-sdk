@@ -146,7 +146,7 @@ public class PredicIO {
 
     /* Start tracking */
 
-    public void startTrackingLocation(Activity activity) {
+    public void startTrackingLocation(final Activity activity) {
         final Context context = activity.getApplicationContext();
 
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
@@ -161,13 +161,13 @@ public class PredicIO {
                     int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
                     if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
                         this.cancel();
-                        startLocationServices(context);
+                        startLocationServices(activity);
                     }
                 }
             }, 5 * 1000, 5 * 1000);
         }
         else
-            startLocationServices(context);
+            startLocationServices(activity);
     }
 
     public void startTrackingApps(final Context context) {
@@ -292,12 +292,11 @@ public class PredicIO {
         FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
-                AAID = advertisingInfo.getId();
-                startService(context, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
-                improveTrackingLocation(context);
+            AAID = advertisingInfo.getId();
+            startService(context, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
+            improveTrackingLocation(context);
             }
         });
-
         task.execute();
     }
 
