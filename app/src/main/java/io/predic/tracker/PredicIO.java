@@ -157,12 +157,12 @@ public class PredicIO {
 
     public void setIdentity(Context context, String email) {
         if (email != null) {
-            
+            Log.d("Predicio","length:" + email.length());
             if(email.contains("@"))
             {
                 identity = getMD5(email.toLowerCase());
             }
-            else if(email.length()==32)
+            else if(email.length() == 32)
             {
                 identity = email;
             }
