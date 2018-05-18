@@ -41,23 +41,6 @@ public class PredicIOReceiver extends BroadcastReceiver {
             PredicIO.getInstance().sendHttpIdentityRequest();
         } else if (intent.getAction().equals(PredicIO.ACTION_TRACK_LOCATION)) {
             try {
-                PredicIO.getInstance().improveTrackingLocation(context);
-              /*
-                LocationCallback mLocationCallback = new LocationCallback() {
-                    @Override
-                    public void onLocationResult(LocationResult locationResult) {
-                        Log.d("PREDICIO", "Location updated");
-                    }
-                };
-
-                LocationRequest mLocationRequest = new LocationRequest();
-                mLocationRequest.setInterval(5000);
-                mLocationRequest.setFastestInterval(1000);
-                mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-                FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
-                mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
-*/
                 FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
                 mFusedLocationClient.getLastLocation()
                         .addOnSuccessListener(new OnSuccessListener<Location>() {
@@ -91,7 +74,7 @@ public class PredicIOReceiver extends BroadcastReceiver {
             }
 
             if (trackingLocation != null && trackingLocation.equals("true")) {
-                PredicIO.getInstance().startLocationServices(context);
+               // PredicIO.getInstance().startLocationServices(context);
             }
         }
     }
