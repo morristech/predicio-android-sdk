@@ -74,7 +74,7 @@ public class PredicIOReceiver extends BroadcastReceiver {
             }
 
             if (trackingLocation != null && trackingLocation.equals("true")) {
-               // PredicIO.getInstance().startLocationServices(context);
+                PredicIO.getInstance().startLocationServices(context);
             }
         }
     }
