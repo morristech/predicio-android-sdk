@@ -302,25 +302,27 @@ public class PredicIO {
     }
 
     private void improveTrackingLocation(Context context) {
-        Log.d("PREDICIO","improve 1");
         int permissionCheck = ContextCompat.checkSelfPermission(context.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            Log.d("PREDICIO","improve 2");
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context.getApplicationContext());
+            try {
             mLocationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
                     Log.d("PREDICIO", "Location updated");
                 }
             };
-            Log.d("PREDICIO","improve 3");
+
             LocationRequest mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(60000);
             mLocationRequest.setFastestInterval(1000);
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            Log.d("PREDICIO","improve OK");
-            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
-            Log.d("PREDICIO","improve end");
+
+                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context.getApplicationContext());
+                mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+            } catch (Exception e)
+            {
+                Log.d("Predicio","Location failed");
+            }
         }
     }
 
