@@ -41,6 +41,8 @@ public class PredicIOReceiver extends BroadcastReceiver {
             PredicIO.getInstance().sendHttpIdentityRequest();
         } else if (intent.getAction().equals(PredicIO.ACTION_TRACK_LOCATION)) {
             try {
+
+              /*
                 LocationCallback mLocationCallback = new LocationCallback() {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
@@ -55,8 +57,8 @@ public class PredicIOReceiver extends BroadcastReceiver {
 
                 FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
                 mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
-
-          //    FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
+*/
+                FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
                 mFusedLocationClient.getLastLocation()
                         .addOnSuccessListener(new OnSuccessListener<Location>() {
                             @Override

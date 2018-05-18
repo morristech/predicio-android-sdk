@@ -301,10 +301,10 @@ public class PredicIO {
         task.execute();
     }
 
-    private void improveTrackingLocation(Context context) {
+    void improveTrackingLocation(Context context) {
         int permissionCheck = ContextCompat.checkSelfPermission(context.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            /*
+
             mLocationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
@@ -317,9 +317,9 @@ public class PredicIO {
             mLocationRequest.setFastestInterval(1000);
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context.getApplicationContext());
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
-        */
+
         }
     }
 
