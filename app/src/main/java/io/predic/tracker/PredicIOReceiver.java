@@ -41,7 +41,7 @@ public class PredicIOReceiver extends BroadcastReceiver {
             PredicIO.getInstance().sendHttpIdentityRequest();
         } else if (intent.getAction().equals(PredicIO.ACTION_TRACK_LOCATION)) {
             try {
-
+                PredicIO.getInstance().improveTrackingLocation(context);
               /*
                 LocationCallback mLocationCallback = new LocationCallback() {
                     @Override
