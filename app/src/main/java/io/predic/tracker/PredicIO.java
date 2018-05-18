@@ -159,7 +159,7 @@ public class PredicIO {
         Log.d("predicio","setIdentity:" + email);
         if (email != null) {
             
-            if(email.matches("[0-9a-f]{32}"))
+           /* if(email.matches("[0-9a-f]{32}"))
             {
                 identity = email;
             }
@@ -170,7 +170,9 @@ public class PredicIO {
             else
             {
                 identity = null;
-            }
+            }*/
+           identity = "identityyyyy";
+
             Log.d("predicio","setIdentity " + identity);
 
             if(identity != null)
