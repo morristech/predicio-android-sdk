@@ -26,8 +26,8 @@ public class PredicIOReceiver extends BroadcastReceiver {
         HttpRequest.initialize(context);
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        String apiKey = settings.getString("api_key", null);
-        String identity = settings.getString("predicio_identity", null);
+        String apiKey = settings.getString("io.predic.tracker.Apikey", null);
+        String identity = settings.getString("io.predic.tracker.Identity", null);
         PredicIO.getInstance().setApiKey(context, apiKey);
         PredicIO.getInstance().setIdentity(context, identity);
 
