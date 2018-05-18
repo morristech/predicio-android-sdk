@@ -21,8 +21,8 @@ public class PredicIOReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.d("PREDICIO","onReceive");
-        
+        Log.d("PREDICIO","onReceive OK");
+
         PredicIO.getInstance().updateAAID(context);
         HttpRequest.initialize(context);
 
