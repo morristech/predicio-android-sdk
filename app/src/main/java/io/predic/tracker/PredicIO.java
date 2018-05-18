@@ -111,6 +111,8 @@ public class PredicIO {
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Predicio","improveTrackingLocation GRANTED");
+
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context.getApplicationContext());
             mLocationCallback = new LocationCallback() {
                 @Override

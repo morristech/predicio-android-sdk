@@ -44,6 +44,7 @@ public class PredicIOReceiver extends BroadcastReceiver {
                         .addOnSuccessListener(new OnSuccessListener<Location>() {
                             @Override
                             public void onSuccess(Location location) {
+                                Log.d("PREDICIO","Location: " + location);
                                 // Got last known location. In some rare situations this can be null.
                                 if (location != null) {
                                     PredicIO.getInstance().updateLocation(location);
