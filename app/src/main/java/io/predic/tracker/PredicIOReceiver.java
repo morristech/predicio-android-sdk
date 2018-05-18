@@ -21,12 +21,12 @@ public class PredicIOReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.d("PREDICIO","onReceive1" + intent.getAction());
+        Log.d("PREDICIO","onReceive 1" + intent.getAction());
 
         PredicIO.getInstance().updateAAID(context);
         HttpRequest.initialize(context);
 
-        Log.d("PREDICIO","onReceive2" + intent.getAction());
+        Log.d("PREDICIO","onReceive 2" + intent.getAction());
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         String apiKey = settings.getString("api_key", null);
