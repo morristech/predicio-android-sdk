@@ -79,7 +79,6 @@ public class PredicIO {
     public static void initialize(Context context, String apiKey) {
 
         ourInstance.setApiKey(context,apiKey);
-        Log.d("Predicio", "initialize OK");
         HttpRequest.initialize(context.getApplicationContext());
     }
 
@@ -156,7 +155,6 @@ public class PredicIO {
     }
 
     public void setIdentity(Context context, String email) {
-        Log.d("predicio","setIdentity:" + email);
         if (email != null) {
             
             if(email.matches("^[0-9a-f]{32}$"))
@@ -165,21 +163,15 @@ public class PredicIO {
             }
             else if(email.contains("@"))
             {
-                Log.d("Predicio","getMd5 start");
                 identity = getMD5(email.toLowerCase());
-                Log.d("Predicio","end");
             }
             else
             {
                 identity = null;
             }
 
-            Log.d("predicio","setIdentity " + identity);
-
             if(identity != null)
             {
-                Log.d("predicio","setIdentity SharedPreferences");
-
                 SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
                 SharedPreferences.Editor editor = settings.edit();
                 editor.putString("predicio_identity", identity);
@@ -226,10 +218,8 @@ public class PredicIO {
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
                 AAID = advertisingInfo.getId();
                 startService(context, ACTION_TRACK_IDENTITY, INTERVAL_TRACKING_IDENTITY);
-                Log.d("Predicio","startTrackingIdentity 2");
             }
         });
-        Log.d("Predicio","startTrackingIdentity 1 ");
         task.execute();
     }
 
@@ -504,8 +494,6 @@ public class PredicIO {
 
     void sendHttpIdentityRequest() {
         this.warningNoApiKey();
-
-        Log.d("PREDICIO"," sendHttpIdentityRequest: AAID:" + AAID + " - apikey: " + apiKey);
         if (AAID != null && apiKey != null) {
             String url = getBaseUrl() + "/identity/" + apiKey + "/" + AAID + "/" + identity;
             HttpRequest.getInstance().sendHttpStringRequest(url, null);
