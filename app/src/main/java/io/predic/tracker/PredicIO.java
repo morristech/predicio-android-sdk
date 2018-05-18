@@ -288,13 +288,13 @@ public class PredicIO {
         }
     }
 
-    void startLocationServices(final Context context) {
-        FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
+    void startLocationServices(final Activity activity) {
+        FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(activity.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
             AAID = advertisingInfo.getId();
-            startService(context, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
-            improveTrackingLocation(context);
+            startService(activity, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
+            improveTrackingLocation(activity);
             }
         });
         task.execute();
