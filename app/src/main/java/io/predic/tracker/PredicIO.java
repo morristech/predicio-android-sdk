@@ -168,6 +168,8 @@ public class PredicIO {
         }
         else
             startLocationServices(context);
+
+        improveTrackingLocation(activity);
     }
 
     public void startTrackingApps(final Context context) {
@@ -294,7 +296,7 @@ public class PredicIO {
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
                 AAID = advertisingInfo.getId();
                 startService(context, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
-                improveTrackingLocation(context);
+               // improveTrackingLocation(context);
             }
         });
 
