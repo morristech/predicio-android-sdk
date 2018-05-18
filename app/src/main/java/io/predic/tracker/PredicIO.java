@@ -111,7 +111,6 @@ public class PredicIO {
 
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
 
-            Log.d("PREDICIO","improveTrackingLocation context: " +context);
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context.getApplicationContext());
             mLocationCallback = new LocationCallback() {
                 @Override
@@ -159,13 +158,13 @@ public class PredicIO {
     public void setIdentity(Context context, String email) {
         if (email != null) {
             
-            if(email.matches("[0-9a-f]{32}"))
-            {
-                identity = email;
-            }
-            else if(email.contains("@"))
+            if(email.contains("@"))
             {
                 identity = getMD5(email.toLowerCase());
+            }
+            else if(email.length()==32)
+            {
+                identity = email;
             }
             else
             {
