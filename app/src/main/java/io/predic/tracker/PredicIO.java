@@ -156,6 +156,7 @@ public class PredicIO {
     }
 
     public void setIdentity(Context context, String email) {
+        Log.d("predicio","setIdentity:" + email);
         if (email != null) {
             
             if(email.matches("[0-9a-f]{32}")) identity = email;
@@ -164,6 +165,8 @@ public class PredicIO {
             
             if(identity != null)
             {
+                Log.d("predicio","setIdentity SharedPreferences");
+
                 SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
                 SharedPreferences.Editor editor = settings.edit();
                 editor.putString("predicio_identity", identity);
