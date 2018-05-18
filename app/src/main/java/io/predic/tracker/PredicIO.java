@@ -210,10 +210,10 @@ public class PredicIO {
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
                 AAID = advertisingInfo.getId();
                 startService(context, ACTION_TRACK_IDENTITY, INTERVAL_TRACKING_IDENTITY);
-                Log.d("Predicio","startTrackingIdentity");
+                Log.d("Predicio","startTrackingIdentity 2");
             }
         });
-
+        Log.d("Predicio","startTrackingIdentity 1 ");
         task.execute();
     }
 
