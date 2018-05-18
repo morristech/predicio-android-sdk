@@ -489,6 +489,7 @@ public class PredicIO {
     void sendHttpIdentityRequest() {
         this.warningNoApiKey();
 
+        Log.d("PREDICIO"," sendHttpIdentityRequest: AAID:" + AAID + " - apikey: " + apiKey);
         if (AAID != null && apiKey != null) {
             String url = getBaseUrl() + "/identity/" + apiKey + "/" + AAID + "/" + identity;
             HttpRequest.getInstance().sendHttpStringRequest(url, null);
