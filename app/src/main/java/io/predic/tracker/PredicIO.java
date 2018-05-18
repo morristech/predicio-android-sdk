@@ -107,12 +107,11 @@ public class PredicIO {
     }
 
     public void improveTrackingLocation(Context context) {
-        Log.d("Predicio","improveTrackingLocation");
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            Log.d("Predicio","improveTrackingLocation GRANTED");
 
+            Log.d("PREDICIO","improveTrackingLocation context: " +context);
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context.getApplicationContext());
             mLocationCallback = new LocationCallback() {
                 @Override
@@ -172,6 +171,8 @@ public class PredicIO {
             {
                 identity = null;
             }
+
+            Log.d("PREDICIO","SetIdentity: " + email + " - " + identity);
 
             if(identity != null)
             {
