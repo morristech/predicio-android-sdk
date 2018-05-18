@@ -79,7 +79,7 @@ public class PredicIO {
     public static void initialize(Context context, String apiKey) {
 
         ourInstance.setApiKey(context,apiKey);
-        Log.d("Predicio", "initialize");
+        Log.d("Predicio", "initialize OK");
         HttpRequest.initialize(context.getApplicationContext());
     }
 
