@@ -107,10 +107,11 @@ public class PredicIO {
     }
 
     public void improveTrackingLocation(Context context) {
-        Log.d("PREDICIO","improveTrackingLocation");
+        Log.d("Predicio","improveTrackingLocation");
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Predicio","improveTrackingLocation GRANTED");
 
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context.getApplicationContext());
             mLocationCallback = new LocationCallback() {
@@ -197,7 +198,7 @@ public class PredicIO {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
 
-        //checkingPermission
+        //startCheckingPermissionTask
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -206,18 +207,7 @@ public class PredicIO {
 
                 if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
                     this.cancel();
-
-                    //launch services
-                    FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
-                        @Override
-                        public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
-                        AAID = advertisingInfo.getId();
-                        startService(context, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
-                        improveTrackingLocation(context);
-                        }
-                    });
-                    task.execute();
-
+                    startLocationServices(context);
                 }
             }
         }, 5 * 1000, 5 * 1000);
@@ -397,6 +387,19 @@ public class PredicIO {
         }
 
         return obj;
+    }
+
+    public void startLocationServices(final Context context) {
+        FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
+            @Override
+            public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
+                AAID = advertisingInfo.getId();
+                startService(context, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
+                improveTrackingLocation(context);
+            }
+        });
+
+        task.execute();
     }
 
     private void showDialog(String title, String message, final Activity activity, final HttpRequestResponseCallback callback) {
