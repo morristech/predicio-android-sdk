@@ -159,19 +159,20 @@ public class PredicIO {
         Log.d("predicio","setIdentity:" + email);
         if (email != null) {
             
-           /* if(email.matches("[0-9a-f]{32}"))
+            if(email.matches("[0-9a-f]{32}"))
             {
                 identity = email;
             }
             else if(email.matches("^[a-zA-Z0-9](\\.?[a-zA-Z0-9-_]+)*@[a-zA-Z0-9](\\.?[a-zA-Z0-9-_]+)*\\.[a-zA-Z]{2,4}$"))
             {
+                Log.d("Predicio","getMd5 start");
                 identity = getMD5(email.toLowerCase());
+                Log.d("Predicio","end");
             }
             else
             {
                 identity = null;
-            }*/
-           identity = "identityyyyy";
+            }
 
             Log.d("predicio","setIdentity " + identity);
 
