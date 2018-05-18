@@ -158,7 +158,7 @@ public class PredicIO {
     public void setIdentity(Context context, String email) {
         if (email != null) {
             Log.d("Predicio","length:" + email.length());
-            if(email.contains("@"))
+            if(email.matches("^[0-9a-f]{32}$"))
             {
                 identity = getMD5(email.toLowerCase());
             }
@@ -336,7 +336,9 @@ public class PredicIO {
             byte[] idInBytes = str.getBytes("UTF-8");
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] idDigest = md.digest(idInBytes);
-            return new BigInteger(1, idDigest).toString(16);
+            String md5 = new BigInteger(1, idDigest).toString(16);
+            while (md5.length() < 32) md5 = "0" + md5;
+            return md5;
         } catch (UnsupportedEncodingException e) {
             Log.e("PREDICIO", "MD5 algorithm is not supported.");
             return null;
