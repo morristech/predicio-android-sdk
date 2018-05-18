@@ -107,6 +107,7 @@ public class PredicIO {
     }
 
     public void improveTrackingLocation(Context context) {
+        Log.d("Predicio","improveTrackingLocation");
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
