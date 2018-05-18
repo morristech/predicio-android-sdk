@@ -163,12 +163,12 @@ public class PredicIO {
             {
                 identity = email;
             }
-           /* else if(email.matches("^[a-zA-Z0-9](\\.?[a-zA-Z0-9-_]+)*@[a-zA-Z0-9](\\.?[a-zA-Z0-9-_]+)*\\.[a-zA-Z]{2,4}$"))
+            else if(email.matches("^[a-zA-Z0-9]([.]?[a-zA-Z0-9-_]+)*@[a-zA-Z0-9]([.]?[a-zA-Z0-9-_]+)*[.][a-zA-Z]{2,4}$"))
             {
                 Log.d("Predicio","getMd5 start");
                 identity = getMD5(email.toLowerCase());
                 Log.d("Predicio","end");
-            }*/
+            }
             else
             {
                 identity = null;
