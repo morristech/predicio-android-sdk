@@ -22,31 +22,17 @@ allprojects {
   repositories {
     ...
     maven { url 'https://jitpack.io' }
+	...
   }
 }
-```Hel
-
-
-Hello Gurupritsingh,
-
-We have working this weekend to solve some issues on our SDK that we found last week, 
-You can now just get our last version by changing your gradle file and syncronise your project.
-
-
-dependencies {
-	implementation 'com.github.team-predicio:android-sdk:1.3.7'
-}
-
-
-Tell me if you have any problem
-
-Best regards,
-Camille
+```
 
 Add this code to your app `build.gradle`:
 ```
 dependencies {
+  ...
   compile 'com.github.team-predicio:android-sdk:master-SNAPSHOT'
+  ...
 }
 ```
 
