@@ -51,22 +51,22 @@ PredicIO.initialize(this, "API_KEY");
 Predicio SDK gives you access to 3 different functions to manage consent easily:
 
 
-`checkOptin` will check user consent regarding Predicio services:
+`checkOptIn` will check user consent regarding Predicio services:
 ```
 // PredicIO server will send "OK" if registered. "KO" if not registered.
-PredicIO.getInstance().checkOptin(this, null);
+PredicIO.getInstance().checkOptIn(this, null);
 ```
 
-`showOptin` will display a customizable pop-up including `title` and `message` to request user opt-in.
+`showOptIn` will display a customizable pop-up including `title` and `message` to request user opt-in.
 ```
-PredicIO.getInstance().showOptin(title, message, this, null);
-```
-
-`setOptin` will save user consent regarding Predicio services. Users will be considered as opted-in.
-```PredicIO.getInstance().setOptin(this, null);
+PredicIO.getInstance().showOptIn(title, message, this, null);
 ```
 
-To get the`checkOptin` and `showOptin` functions results, please use:
+`setOptIn` will save user consent regarding Predicio services. Users will be considered as opted-in.
+```PredicIO.getInstance().setOptIn(this, null);
+```
+
+To get the`checkOptIn` and `showOptIn` functions results, please use:
 ```
 public interface HttpRequestResponseCallback {
   void onStringResponseSuccess(String response);
@@ -106,7 +106,7 @@ PredicIO.getInstance().stopTrackingForeground(this.getApplication());
 final MainActivity myContext = this;
 PredicIO.initialize(myContext, "9d5e3ecdeb4cdb7acfd63075ae046672");
 PredicIO.getInstance().setIdentity(myContext, "dev@predic.io");
-PredicIO.getInstance().checkOptin(myContext, new HttpRequestResponseCallback() {
+PredicIO.getInstance().checkOptIn(myContext, new HttpRequestResponseCallback() {
   @Override
   public void onStringResponseSuccess(String response) {
     if(response.equals("KO")) {

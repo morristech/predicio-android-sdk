@@ -75,7 +75,7 @@ public class PredicIO {
         HttpRequest.initialize(context.getApplicationContext());
     }
 
-    public void checkOptin(Context context, final HttpRequestResponseCallback callback) {
+    public void checkOptIn(Context context, final HttpRequestResponseCallback callback) {
         FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
