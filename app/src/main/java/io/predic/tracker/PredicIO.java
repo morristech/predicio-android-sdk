@@ -97,7 +97,7 @@ public class PredicIO {
         task.execute();
     }
 
-    public void showOptin(final String title, final String message, final Activity activity, final HttpRequestResponseCallback callback) {
+    public void showOptIn(final String title, final String message, final Activity activity, final HttpRequestResponseCallback callback) {
 
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
