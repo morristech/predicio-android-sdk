@@ -58,6 +58,7 @@ public class PredicIO {
     private LocationCallback mLocationCallback = null;
     private FusedLocationProviderClient mFusedLocationClient = null;
     private static int nbOccurrencesLocation = 0;
+    private static boolean speedTracking = true;
     private String apiKey;
     private String AAID;
     private double latitude;
@@ -249,7 +250,7 @@ public class PredicIO {
         return obj;
     }
 
-    void updateLocation(Location location) {
+    void receiveLocation(Context context, Location location) {
         if (location != null) {
             double _latitude, _longitude, _accuracy;
             String _provider;
@@ -261,6 +262,14 @@ public class PredicIO {
 
             boolean isNewLocation = !isSameLocation(_latitude, _longitude);
             nbOccurrencesLocation = isNewLocation == true ? 0 : nbOccurrencesLocation + 1;
+
+            boolean newSpeedTracking = nbOccurrencesLocation < 3 ? true : false;
+            if(newSpeedTracking!=speedTracking)
+            {
+                speedTracking = newSpeedTracking;
+                long interval = (newSpeedTracking) ? 60000 : 300000;
+                improveTrackingLocation(context, interval);
+            }
 
             latitude = _latitude;
             longitude = _longitude;
@@ -293,31 +302,40 @@ public class PredicIO {
         FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
-            AAID = advertisingInfo.getId();
-            startService(context, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
-            improveTrackingLocation(context);
+                AAID = advertisingInfo.getId();
+                startService(context, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
+                improveTrackingLocation(context, 60000);
             }
         });
         task.execute();
     }
 
-    private void improveTrackingLocation(Context context) {
+    private void improveTrackingLocation(Context context, long interval) {
         int permissionCheck = ContextCompat.checkSelfPermission(context.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
 
-            mLocationCallback = new LocationCallback() {
-                @Override
-                public void onLocationResult(LocationResult locationResult) {
-                    Log.d("PREDICIO", "Location updated");
-                }
-            };
+            if (mFusedLocationClient != null && mLocationCallback != null) {
+                mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+            }
+            if( mLocationCallback == null) {
+                mLocationCallback = new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        Log.d("PREDICIO", "Location updated");
+                    }
+                };
+            }
+            if(mFusedLocationClient == null) {
+                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
+            }
+
+            Log.d("PREDICIO","improveTrackingLocation: "+interval);
 
             LocationRequest mLocationRequest = new LocationRequest();
-            mLocationRequest.setInterval(60000);
+            mLocationRequest.setInterval(interval);
             mLocationRequest.setFastestInterval(5000);
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
 
         }
@@ -439,7 +457,7 @@ public class PredicIO {
 
     void sendHttpIdentityRequest() {
         this.warningNoApiKey();
-        if (AAID != null && apiKey != null) {
+        if (AAID != null && apiKey != null && identity != null) {
             String url = getBaseUrl() + "/identity/" + apiKey + "/" + AAID + "/" + identity;
             HttpRequest.getInstance().sendHttpStringRequest(url, null);
         }

@@ -9,9 +9,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -22,7 +19,7 @@ import static android.content.Intent.ACTION_BOOT_COMPLETED;
 public class PredicIOReceiver extends BroadcastReceiver {
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, Intent intent) {
 
         Log.d("PREDICIO", "PredicIOReceiver.onReceive: " + intent.getAction());
         PredicIO.getInstance().updateAAID(context);
@@ -48,7 +45,7 @@ public class PredicIOReceiver extends BroadcastReceiver {
                             public void onSuccess(Location location) {
                                 // Got last known location. In some rare situations this can be null.
                                 if (location != null) {
-                                    PredicIO.getInstance().updateLocation(location);
+                                    PredicIO.getInstance().receiveLocation(context,location);
                                 }
                             }
                         });
