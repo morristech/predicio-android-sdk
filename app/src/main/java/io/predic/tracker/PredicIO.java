@@ -314,7 +314,7 @@ public class PredicIO {
 
             LocationRequest mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(60000);
-            mLocationRequest.setFastestInterval(1000);
+            mLocationRequest.setFastestInterval(5000);
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
