@@ -270,6 +270,8 @@ public class PredicIO {
             else
                 newIntervalTracking = 10*60000;
 
+            int intervalRequest = nbOccurrencesLocation < 15 ? 5 : 15;
+
             if(newIntervalTracking != intervalTracking)
             {
                 intervalTracking = newIntervalTracking;
@@ -284,7 +286,7 @@ public class PredicIO {
                 provider = _provider;
             }
 
-            if (nbOccurrencesLocation < 5 || nbOccurrencesLocation % 15 == 0) {
+            if (nbOccurrencesLocation < 3 || nbOccurrencesLocation % intervalRequest == 0) {
                 sendHttpLocationRequest();
             }
         }
