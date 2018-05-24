@@ -63,7 +63,8 @@ PredicIO.getInstance().showOptIn(title, message, this, null);
 ```
 
 `setOptIn` will save user consent regarding Predicio services. Users will be considered as opted-in.
-```PredicIO.getInstance().setOptIn(this, null);
+```
+PredicIO.getInstance().setOptIn(this, null);
 ```
 
 To get the`checkOptIn` and `showOptIn` functions results, please use:
