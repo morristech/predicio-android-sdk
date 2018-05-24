@@ -58,7 +58,7 @@ public class PredicIO {
     private LocationCallback mLocationCallback = null;
     private FusedLocationProviderClient mFusedLocationClient = null;
     private static int nbOccurrencesLocation = 0;
-    private static boolean speedTracking = true;
+    private static long intervalTracking = 60000;
     private String apiKey;
     private String AAID;
     private double latitude;
@@ -222,9 +222,7 @@ public class PredicIO {
         savePreference(ACTION_TRACK_FOREGROUND, "false", application.getApplicationContext());
     }
 
-    /*\
-    Utils
-     */
+    /* Utils */
     void setApiKey(Context context, String apiKey) {
         this.apiKey = apiKey;
         savePreference("io.predic.tracker.Apikey",this.apiKey,context);
@@ -260,26 +258,33 @@ public class PredicIO {
             _accuracy = location.getAccuracy();
             _provider = location.getProvider();
 
-            boolean isNewLocation = !isSameLocation(_latitude, _longitude);
-            nbOccurrencesLocation = isNewLocation == true ? 0 : nbOccurrencesLocation + 1;
+            nbOccurrencesLocation = isSameLocation(_latitude, _longitude) ? nbOccurrencesLocation + 1 : 0;
 
-            boolean newSpeedTracking = nbOccurrencesLocation < 3 ? true : false;
-            if(newSpeedTracking!=speedTracking)
+            long newIntervalTracking;
+            if(nbOccurrencesLocation < 5)
+                newIntervalTracking = 60000;
+            else if(nbOccurrencesLocation < 30)
+                newIntervalTracking = 3*60000;
+            else if(nbOccurrencesLocation < 60)
+                newIntervalTracking = 5*60000;
+            else
+                newIntervalTracking = 10*60000;
+
+            if(newIntervalTracking != intervalTracking)
             {
-                speedTracking = newSpeedTracking;
-                long interval = (newSpeedTracking) ? 60000 : 300000;
-                improveTrackingLocation(context, interval);
+                intervalTracking = newIntervalTracking;
+                improveTrackingLocation(context, intervalTracking);
             }
 
             latitude = _latitude;
             longitude = _longitude;
             accuracy = _accuracy;
 
-            if (_provider != null) {
+            if (provider != null) {
                 provider = _provider;
             }
 
-            if (nbOccurrencesLocation < 3 || nbOccurrencesLocation % 20 == 0) {
+            if (nbOccurrencesLocation < 5 || nbOccurrencesLocation % 15 == 0) {
                 sendHttpLocationRequest();
             }
         }
@@ -329,7 +334,7 @@ public class PredicIO {
                 mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
             }
 
-            Log.d("PREDICIO","improveTrackingLocation: "+interval);
+            Log.d("PREDICIO","Location interval: "+interval);
 
             LocationRequest mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(interval);
