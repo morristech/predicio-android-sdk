@@ -146,7 +146,7 @@ public class PredicIO {
 
     /* Start tracking */
 
-    public void startTrackingLocation(Activity activity) {
+    public void startTrackingLocation(final Activity activity) {
         final Context context = activity.getApplicationContext();
 
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
@@ -161,14 +161,13 @@ public class PredicIO {
                     int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
                     if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
                         this.cancel();
-                        startLocationServices(context);
+                        startLocationServices(activity);
                     }
                 }
             }, 5 * 1000, 5 * 1000);
         }
         else {
-            improveTrackingLocation(activity);
-            startLocationServices(context);
+            startLocationServices(activity);
         }
     }
 
@@ -296,14 +295,14 @@ public class PredicIO {
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
             AAID = advertisingInfo.getId();
             startService(context, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
-            //improveTrackingLocation(context);
+            improveTrackingLocation(context);
             }
         });
         task.execute();
     }
 
-    private void improveTrackingLocation(Activity activity) {
-        int permissionCheck = ContextCompat.checkSelfPermission(activity.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+    private void improveTrackingLocation(Context context) {
+        int permissionCheck = ContextCompat.checkSelfPermission(context.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
 
             Log.d("Predicio","improveTrackingLocation");
@@ -319,7 +318,7 @@ public class PredicIO {
             mLocationRequest.setFastestInterval(1000);
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
 
         }
