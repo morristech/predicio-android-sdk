@@ -305,7 +305,6 @@ public class PredicIO {
         int permissionCheck = ContextCompat.checkSelfPermission(context.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
 
-            Log.d("Predicio","improveTrackingLocation");
             mLocationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
@@ -315,7 +314,7 @@ public class PredicIO {
 
             LocationRequest mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(60000);
-            mLocationRequest.setFastestInterval(1000);
+            mLocationRequest.setFastestInterval(20000);
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
