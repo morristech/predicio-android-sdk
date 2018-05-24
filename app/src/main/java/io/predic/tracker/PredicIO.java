@@ -167,7 +167,7 @@ public class PredicIO {
             }, 5 * 1000, 5 * 1000);
         }
         else {
-            improveTrackingLocation(activity.getApplicationContext());
+            improveTrackingLocation(activity);
             startLocationServices(context);
         }
     }
