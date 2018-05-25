@@ -238,7 +238,15 @@ public class PredicIO {
 
     JSONObject getJSONObjectApps(Context context) {
         final PackageManager pm = context.getApplicationContext().getPackageManager();
-        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+
+        List<ApplicationInfo> packages;
+
+        try {
+            packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+        } catch(Exception e) {
+            return null;
+        }
+
         JSONArray apps = new JSONArray();
 
         for (ApplicationInfo packageInfo : packages) {
