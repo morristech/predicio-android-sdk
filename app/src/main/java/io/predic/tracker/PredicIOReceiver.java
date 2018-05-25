@@ -43,14 +43,14 @@ public class PredicIOReceiver extends BroadcastReceiver {
                 FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
                 mFusedLocationClient.getLastLocation()
                     .addOnSuccessListener(new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
+                        @Override
+                        public void onSuccess(Location location) {
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
                                 PredicIO.getInstance().receiveLocation(context,location);
-                                }
                             }
-                        });
+                        }
+                    });
             } catch(SecurityException e) {
                 Log.e("PREDICIO", "Location permissions not accepted");
             }
