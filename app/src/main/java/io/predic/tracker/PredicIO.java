@@ -197,7 +197,7 @@ public class PredicIO {
             task.execute();
         }
         else {
-            Log.d("PREDICIO","You are trying to tracking Identity but identity is not set");
+            Log.d("PREDICIO","Fail to launch startTrackingIdentity, You are trying to tracking Identity but identity is not set");
         }
     }
 
