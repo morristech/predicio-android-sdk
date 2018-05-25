@@ -185,14 +185,20 @@ public class PredicIO {
     }
 
     public void startTrackingIdentity(final Context context) {
-        FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
-            @Override
-            public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
-                AAID = advertisingInfo.getId();
-                startService(context, ACTION_TRACK_IDENTITY, INTERVAL_TRACKING_IDENTITY);
-            }
-        });
-        task.execute();
+
+        if(identity != null) {
+            FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
+                @Override
+                public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
+                    AAID = advertisingInfo.getId();
+                    startService(context, ACTION_TRACK_IDENTITY, INTERVAL_TRACKING_IDENTITY);
+                }
+            });
+            task.execute();
+        }
+        else {
+            Log.d("PREDICIO","You are trying to tracking Identity but identity is not set");
+        }
     }
 
     public void startTrackingForeground(Application application) {
