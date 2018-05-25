@@ -42,12 +42,12 @@ public class PredicIOReceiver extends BroadcastReceiver {
             try {
                 FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
                 mFusedLocationClient.getLastLocation()
-                        .addOnSuccessListener(new OnSuccessListener<Location>() {
+                    .addOnSuccessListener(new OnSuccessListener<Location>() {
                             @Override
                             public void onSuccess(Location location) {
-                                // Got last known location. In some rare situations this can be null.
-                                if (location != null) {
-                                    PredicIO.getInstance().receiveLocation(context,location);
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                PredicIO.getInstance().receiveLocation(context,location);
                                 }
                             }
                         });
