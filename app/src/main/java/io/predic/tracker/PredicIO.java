@@ -147,7 +147,7 @@ public class PredicIO {
 
     /* Start tracking */
 
-    public void startTrackingLocation(final Activity activity) {
+    public void startTrackingLocationWithPermissionRequest(final Activity activity) {
         final Context context = activity.getApplicationContext();
 
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
@@ -169,6 +169,14 @@ public class PredicIO {
         }
         else {
             startLocationServices(activity);
+        }
+    }
+    
+    public void startTrackingLocation(final Context context) {
+        int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+        
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            startLocationServices(context);
         }
     }
 
