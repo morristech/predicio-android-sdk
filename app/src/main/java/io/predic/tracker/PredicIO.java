@@ -117,19 +117,19 @@ public class PredicIO {
         messageView.setTextColor(0xAAFFFFFF);
 
         builder.setTitle(title)
-                .setView(messageView)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(callback != null) callback.onStringResponseSuccess(null);
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
+            .setView(messageView)
+            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    if(callback != null) callback.onStringResponseSuccess(null);
+                }
+            })
+            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
                         // do nothing
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+                }
+            })
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
     }
 
     public void setIdentity(Context context, String email) {
@@ -138,8 +138,10 @@ public class PredicIO {
                 identity = getMD5(email.toLowerCase());
             else if(email.matches("^[0-9a-f]{32}$"))
                 identity = email;
-            else
+            else {
+                Log.e("PREDICIO","Unrecogized email identity");
                 identity = null;
+            }
 
             if(identity != null) savePreference("io.predic.tracker.Identity", identity, context);
         }
@@ -176,11 +178,10 @@ public class PredicIO {
         FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
-                AAID = advertisingInfo.getId();
-                startService(context, ACTION_TRACK_APPS, INTERVAL_TRACKING_APPS);
+            AAID = advertisingInfo.getId();
+            startService(context, ACTION_TRACK_APPS, INTERVAL_TRACKING_APPS);
             }
         });
-
         task.execute();
     }
 
@@ -197,7 +198,7 @@ public class PredicIO {
             task.execute();
         }
         else {
-            Log.d("PREDICIO","Fail to launch startTrackingIdentity, You are trying to tracking Identity but identity is not set");
+            Log.e("PREDICIO","Fail to launch startTrackingIdentity, You are trying to tracking Identity but identity is not set");
         }
     }
 
@@ -236,7 +237,13 @@ public class PredicIO {
 
     JSONObject getJSONObjectApps(Context context) {
         final PackageManager pm = context.getApplicationContext().getPackageManager();
-        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+
+        List<ApplicationInfo> packages;
+        try {
+            packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+        } catch(Exception e) {
+            return null;
+        }
         JSONArray apps = new JSONArray();
 
         for (ApplicationInfo packageInfo : packages) {
