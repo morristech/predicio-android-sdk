@@ -53,6 +53,9 @@ public class PredicIO {
     static final String ACTION_TRACK_APPS       = "io.predic.tracker.action.TRACK_APPS";
     static final String ACTION_TRACK_FOREGROUND = "io.predic.tracker.action.TRACK_FOREGROUND";
 
+    public static final String LOCATION_FINE = "Fine";
+    public static final String LOCATION_COARSE = "Coarse";
+
     private static final PredicIO ourInstance = new PredicIO();
     private final ApplicationLifecycleManager appLifecycleManager = new ApplicationLifecycleManager();
     private LocationCallback mLocationCallback = null;
@@ -66,6 +69,7 @@ public class PredicIO {
     private double accuracy;
     private String provider;
     private String identity;
+    private String locationAccuracyMethod;
 
     public static PredicIO getInstance() {
         return ourInstance;
@@ -147,15 +151,31 @@ public class PredicIO {
         }
     }
 
-    /* Start tracking */
+    void setLocationAccuracy(Context context, String accuracyMethod)
+    {
+        locationAccuracyMethod = accuracyMethod;
+        savePreference("io.predic.tracker.locationAccuracyMethod", locationAccuracyMethod, context);
+    }
 
+    /* Start tracking */
     public void startTrackingLocation(final Activity activity) {
+        this.startTrackingLocation(activity, LOCATION_FINE);
+    }
+    public void startTrackingLocation(final Activity activity, String accuracyMethod) {
+
+
         final Context context = activity.getApplicationContext();
+
+        setLocationAccuracy(context,accuracyMethod);
 
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            ActivityCompat.requestPermissions(
+                    activity,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                    1
+            );
             //startCheckingPermissionTask
             Timer timer = new Timer();
             timer.scheduleAtFixedRate(new TimerTask() {
@@ -342,12 +362,16 @@ public class PredicIO {
                 mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
             }
 
-            Log.d("PREDICIO","Location interval: "+interval);
+            if(locationAccuracyMethod == null) {
+                setLocationAccuracy(context, LOCATION_FINE);
+            }
+
+            Log.d("PREDICIO","Location interval: "+interval + ", Location method: " + locationAccuracyMethod);
 
             LocationRequest mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(interval);
             mLocationRequest.setFastestInterval(5000);
-            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            mLocationRequest.setPriority((locationAccuracyMethod.equals(LOCATION_FINE)) ? LocationRequest.PRIORITY_HIGH_ACCURACY : LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
 

@@ -28,8 +28,10 @@ public class PredicIOReceiver extends BroadcastReceiver {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         String apiKey = settings.getString("io.predic.tracker.Apikey", null);
         String identity = settings.getString("io.predic.tracker.Identity", null);
+        String locationMethod = settings.getString("io.predic.tracker.locationAccuracyMethod", null);
         PredicIO.getInstance().setApiKey(context, apiKey);
         PredicIO.getInstance().setIdentity(context, identity);
+        PredicIO.getInstance().setLocationAccuracy(context, locationMethod);
 
         if (intent.getAction().equals(PredicIO.ACTION_TRACK_APPS)) {
             JSONObject obj = PredicIO.getInstance().getJSONObjectApps(context);
