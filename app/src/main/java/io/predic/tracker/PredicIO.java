@@ -263,13 +263,10 @@ public class PredicIO {
 
     void receiveLocation(Context context, Location location) {
         if (location != null) {
-            double _latitude, _longitude, _accuracy;
-            String _provider;
+            double _latitude, _longitude;
 
             _latitude = location.getLatitude();
             _longitude = location.getLongitude();
-            _accuracy = location.getAccuracy();
-            _provider = location.getProvider();
 
             nbOccurrencesLocation = isSameLocation(_latitude, _longitude) ? nbOccurrencesLocation + 1 : 0;
 
