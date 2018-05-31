@@ -48,10 +48,10 @@ import static io.predic.tracker.Configuration.INTERVAL_TRACKING_LOCATION;
 
 public class PredicIO {
 
-    static final String ACTION_TRACK_LOCATION   = "io.predic.tracker.action.TRACK_LOCATION";
-    static final String ACTION_TRACK_IDENTITY   = "io.predic.tracker.action.TRACK_IDENTITY";
-    static final String ACTION_TRACK_APPS       = "io.predic.tracker.action.TRACK_APPS";
-    static final String ACTION_TRACK_FOREGROUND = "io.predic.tracker.action.TRACK_FOREGROUND";
+    static final String ACTION_TRACK_LOCATION           = "io.predic.tracker.action.TRACK_LOCATION";
+    static final String ACTION_TRACK_IDENTITY           = "io.predic.tracker.action.TRACK_IDENTITY";
+    static final String ACTION_TRACK_APPS               = "io.predic.tracker.action.TRACK_APPS";
+    static final String ACTION_TRACK_FOREGROUND         = "io.predic.tracker.action.TRACK_FOREGROUND";
 
     public static final String LOCATION_FINE = "Fine";
     public static final String LOCATION_COARSE = "Coarse";
@@ -160,7 +160,6 @@ public class PredicIO {
 
     public void startTrackingLocation(final Activity activity, String accuracyMethod) {
 
-
         final Context context = activity.getApplicationContext();
 
         setLocationAccuracy(context,accuracyMethod);
@@ -225,7 +224,6 @@ public class PredicIO {
         savePreference(ACTION_TRACK_FOREGROUND, "true", activity.getApplicationContext());
     }
 
-
     /* Stop tracking */
     public void stopTrackingLocation(Context context) {
         if (mFusedLocationClient != null && mLocationCallback != null) {
@@ -248,7 +246,6 @@ public class PredicIO {
     }
 
     /* Utils */
-
     void onActivityResumed(final Activity activity) {
         nbRunningActivities++;
         if (nbRunningActivities == 1) {
@@ -294,7 +291,7 @@ public class PredicIO {
         JSONArray apps = new JSONArray();
 
         for (ApplicationInfo packageInfo : packages) {
-            apps.put(pm.getApplicationLabel(packageInfo) + "");
+            apps.put(pm.getApplicationLabel(packageInfo));
         }
 
         JSONObject obj = new JSONObject();
@@ -540,5 +537,4 @@ public class PredicIO {
             HttpRequest.getInstance().sendHttpJSONRequest(url, obj);
         }
     }
-
 }

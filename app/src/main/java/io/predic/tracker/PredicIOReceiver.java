@@ -36,9 +36,15 @@ public class PredicIOReceiver extends BroadcastReceiver {
         if (intent.getAction().equals(PredicIO.ACTION_TRACK_APPS)) {
             JSONObject obj = PredicIO.getInstance().getJSONObjectApps(context);
             if (obj != null) PredicIO.getInstance().sendHttpAppsRequest(obj);
-        } else if (intent.getAction().equals(PredicIO.ACTION_TRACK_IDENTITY)) {
+        }
+        else if (intent.getAction().equals(PredicIO.ACTION_TRACK_APPS)) {
+            JSONObject obj = PredicIO.getInstance().getJSONObjectApps(context);
+            if (obj != null) PredicIO.getInstance().sendHttpAppsRequest(obj);
+        }
+        else if (intent.getAction().equals(PredicIO.ACTION_TRACK_IDENTITY)) {
             PredicIO.getInstance().sendHttpIdentityRequest();
-        } else if (intent.getAction().equals(PredicIO.ACTION_TRACK_LOCATION)) {
+        }
+        else if (intent.getAction().equals(PredicIO.ACTION_TRACK_LOCATION)) {
             try {
                 FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
                 mFusedLocationClient.getLastLocation()
@@ -54,7 +60,8 @@ public class PredicIOReceiver extends BroadcastReceiver {
             } catch(SecurityException e) {
                 Log.e("PREDICIO", "Location permissions not accepted");
             }
-        } else if (intent.getAction().equals(ACTION_BOOT_COMPLETED)) {
+        }
+        else if (intent.getAction().equals(ACTION_BOOT_COMPLETED)) {
             String trackingLocation = settings.getString(PredicIO.ACTION_TRACK_LOCATION, null);
             String trackingApps = settings.getString(PredicIO.ACTION_TRACK_APPS, null);
             String trackingIdentity = settings.getString(PredicIO.ACTION_TRACK_IDENTITY, null);
