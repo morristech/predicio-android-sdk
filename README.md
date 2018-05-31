@@ -17,7 +17,7 @@ It only collects data you're sharing with us.In order to minimize battery and ne
 ## Install
 
 Add this code to your root `build.gradle`:
-```
+```gradle
 allprojects {
   repositories {
     ...
@@ -28,7 +28,7 @@ allprojects {
 ```
 
 Add this code to your app `build.gradle`:
-```
+```gradle
 dependencies {
   ...
   compile 'com.github.team-predicio:android-sdk:master-SNAPSHOT'

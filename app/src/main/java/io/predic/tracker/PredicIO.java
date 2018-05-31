@@ -271,8 +271,6 @@ public class PredicIO {
             _accuracy = location.getAccuracy();
             _provider = location.getProvider();
 
-            Log.d("PREDICIO",location.toString());
-
             nbOccurrencesLocation = isSameLocation(_latitude, _longitude) ? nbOccurrencesLocation + 1 : 0;
 
             latitude = location.getLatitude();
