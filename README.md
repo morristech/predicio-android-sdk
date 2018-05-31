@@ -89,9 +89,11 @@ PredicIO.getInstance().startTrackingApps(this);
 
 // start tracking user's locations
 PredicIO.getInstance().startTrackingLocation(this);
+you can presice the location method you want to use with PredicIO.LOCATION_FINE` or PredicIO.LOCATION_COARSE, Fine location is use by default.
+Ex : PredicIO.getInstance().startTrackingLocation(this,PredicIO.LOCATION_COARSE);
 
 // Track when user open set your application on foreground
-PredicIO.getInstance().startTrackingForeground(this.getApplication());
+PredicIO.getInstance().startTrackingForeground(this);
 ```
 
 You can stop collecting and sharing data at any moment using the following functions:
@@ -99,7 +101,7 @@ You can stop collecting and sharing data at any moment using the following funct
 PredicIO.getInstance().stopTrackingIdentity(this);
 PredicIO.getInstance().stopTrackingApps(this);
 PredicIO.getInstance().stopTrackingLocation(this);
-PredicIO.getInstance().stopTrackingForeground(this.getApplication());
+PredicIO.getInstance().stopTrackingForeground(this);
 ```
 
 ## Use-case
@@ -120,7 +122,7 @@ PredicIO.getInstance().checkOptIn(myContext, new HttpRequestResponseCallback() {
           PredicIO.getInstance().startTrackingIdentity(myContext);
           PredicIO.getInstance().startTrackingApps(myContext);
           PredicIO.getInstance().startTrackingLocation(myContext);
-          PredicIO.getInstance().startTrackingForeground(myContext.getApplication());
+          PredicIO.getInstance().startTrackingForeground(myContext);
         }
         @Override
         public void onError(VolleyError e) {}
@@ -130,7 +132,7 @@ PredicIO.getInstance().checkOptIn(myContext, new HttpRequestResponseCallback() {
       PredicIO.getInstance().startTrackingIdentity(myContext);
       PredicIO.getInstance().startTrackingApps(myContext);
       PredicIO.getInstance().startTrackingLocation(myContext);
-      PredicIO.getInstance().startTrackingForeground(myContext.getApplication());
+      PredicIO.getInstance().startTrackingForeground(myContext);
     }
   }
   @Override
