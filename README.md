@@ -89,8 +89,9 @@ PredicIO.getInstance().startTrackingApps(this);
 
 // start tracking user's locations
 PredicIO.getInstance().startTrackingLocation(this);
-you can presice the location method you want to use with PredicIO.LOCATION_FINE` or PredicIO.LOCATION_COARSE, Fine location is use by default.
-Ex : PredicIO.getInstance().startTrackingLocation(this,PredicIO.LOCATION_COARSE);
+
+//you can define the accuracy method by using PredicIO.LOCATION_FINE or PredicIO.LOCATION_COARSE, Fine location is use by default.
+PredicIO.getInstance().startTrackingLocation(this,PredicIO.LOCATION_COARSE);
 
 // Track when user open set your application on foreground
 PredicIO.getInstance().startTrackingForeground(this);
