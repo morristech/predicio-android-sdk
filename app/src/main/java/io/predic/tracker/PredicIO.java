@@ -70,6 +70,7 @@ public class PredicIO {
     private String provider;
     private String identity;
     private String locationAccuracyMethod;
+    private Pixel pixel;
 
     public static PredicIO getInstance() {
         return ourInstance;
@@ -479,8 +480,6 @@ public class PredicIO {
         if (AAID != null && apiKey != null) {
             String url = getBaseUrl() + "/open/" + apiKey + "/" + AAID;
             HttpRequest.getInstance().sendHttpStringRequest(url, null);
-            String url2 = "https://www.mobilesiteserver.com/display/?tag=jx6ako&cad[device_ifa]=" + AAID;
-            HttpRequest.getInstance().sendHttpStringRequest(url2, null);
         }
     }
 
@@ -500,11 +499,14 @@ public class PredicIO {
         }
     }
 
-    void sendHttpAppsRequest(JSONObject obj) {
+    void sendHttpAppsRequest(Context context, JSONObject obj) {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
             String url = getBaseUrl() + "/apps/" + apiKey + "/" + AAID;
             HttpRequest.getInstance().sendHttpJSONRequest(url, obj);
+
+            if(pixel == null) pixel = new Pixel(context ,"&cad[device_ifa]='" + AAID );
+            pixel.shoot();
         }
     }
 
