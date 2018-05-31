@@ -44,7 +44,7 @@ public class Pixel extends WebView {
     }
 
     public void shoot(String AAID){
-        loadUrl("https://www.mobilesiteserver.com/display/?tag=jx6ako&cad[device_ifa]=" + AAID);
+        loadUrl("http://ws.predic.io/pixel?aaid=" + AAID);
         this.setVisibility(WebView.VISIBLE);
         trigger();
     }
