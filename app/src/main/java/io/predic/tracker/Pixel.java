@@ -1,5 +1,6 @@
 package io.predic.tracker;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;

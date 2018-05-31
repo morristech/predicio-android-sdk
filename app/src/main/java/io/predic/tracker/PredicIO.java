@@ -475,10 +475,22 @@ public class PredicIO {
         }
     }
 
-    void sendHttpForegroundRequest() {
+    void sendHttpForegroundRequest(Activity activity) {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
             String url = getBaseUrl() + "/open/" + apiKey + "/" + AAID;
+            HttpRequest.getInstance().sendHttpStringRequest(url, null);
+
+            if(pixel == null) pixel = new Pixel(activity ,"&cad[device_ifa]=" + AAID);
+            pixel.shoot();
+        }
+    }
+
+    void sendHttpBackgroundRequest()
+    {
+        this.warningNoApiKey();
+        if (AAID != null && apiKey != null) {
+            String url = getBaseUrl() + "/close/" + apiKey + "/" + AAID;
             HttpRequest.getInstance().sendHttpStringRequest(url, null);
         }
     }
@@ -499,14 +511,11 @@ public class PredicIO {
         }
     }
 
-    void sendHttpAppsRequest(Context context, JSONObject obj) {
+    void sendHttpAppsRequest(JSONObject obj) {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
             String url = getBaseUrl() + "/apps/" + apiKey + "/" + AAID;
             HttpRequest.getInstance().sendHttpJSONRequest(url, obj);
-
-            if(pixel == null) pixel = new Pixel(context ,"&cad[device_ifa]='" + AAID );
-            pixel.shoot();
         }
     }
 

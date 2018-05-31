@@ -35,7 +35,7 @@ public class PredicIOReceiver extends BroadcastReceiver {
 
         if (intent.getAction().equals(PredicIO.ACTION_TRACK_APPS)) {
             JSONObject obj = PredicIO.getInstance().getJSONObjectApps(context);
-            if (obj != null) PredicIO.getInstance().sendHttpAppsRequest(context, obj);
+            if (obj != null) PredicIO.getInstance().sendHttpAppsRequest(obj);
         } else if (intent.getAction().equals(PredicIO.ACTION_TRACK_IDENTITY)) {
             PredicIO.getInstance().sendHttpIdentityRequest();
         } else if (intent.getAction().equals(PredicIO.ACTION_TRACK_LOCATION)) {

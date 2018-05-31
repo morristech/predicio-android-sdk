@@ -10,20 +10,27 @@ class ApplicationLifecycleManager implements Application.ActivityLifecycleCallba
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        Log.d("PREDICIO","activity create");
     }
 
     @Override
     public void onActivityDestroyed(Activity activity) {
+        Log.d("PREDICIO","activity destroy");
     }
 
     @Override
     public void onActivityResumed(Activity activity) {
-
+        Log.d("PREDICIO","activity resume");
+        nbRunningActivities++;
+        if (nbRunningActivities == 1) {
+            Log.d("PREDICIO", "Application in foreground.");
+            PredicIO.getInstance().sendHttpForegroundRequest(activity);
+        }
     }
 
     @Override
     public void onActivityPaused(Activity activity) {
-
+        Log.d("PREDICIO","activity pause");
     }
 
     @Override
@@ -33,18 +40,16 @@ class ApplicationLifecycleManager implements Application.ActivityLifecycleCallba
 
     @Override
     public void onActivityStarted(Activity activity) {
-        nbRunningActivities++;
-        if (nbRunningActivities == 1) {
-            Log.d("PREDICIO", "Application in foreground.");
-            PredicIO.getInstance().sendHttpForegroundRequest();
-        }
+        Log.d("PREDICIO","activity start");
     }
 
     @Override
     public void onActivityStopped(Activity activity) {
-        nbRunningActivities--;
-        if (nbRunningActivities == 0) {
+        Log.d("PREDICIO","activity stop");
+        if(nbRunningActivities > 0) {
+            nbRunningActivities = 0;
             Log.d("PREDICIO", "Application in background.");
+            PredicIO.getInstance().sendHttpBackgroundRequest();
         }
     }
 }
