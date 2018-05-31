@@ -271,7 +271,14 @@ public class PredicIO {
             _accuracy = location.getAccuracy();
             _provider = location.getProvider();
 
+            Log.d("PREDICIO",location.toString());
+
             nbOccurrencesLocation = isSameLocation(_latitude, _longitude) ? nbOccurrencesLocation + 1 : 0;
+
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+            accuracy = location.getAccuracy();
+            provider = location.getProvider();
 
             long newIntervalTracking;
             if(nbOccurrencesLocation < 5)
@@ -285,18 +292,9 @@ public class PredicIO {
 
             int intervalRequest = nbOccurrencesLocation < 15 ? 5 : 15;
 
-            if(newIntervalTracking != intervalTracking)
-            {
+            if(newIntervalTracking != intervalTracking) {
                 intervalTracking = newIntervalTracking;
                 improveTrackingLocation(context, intervalTracking);
-            }
-
-            latitude = _latitude;
-            longitude = _longitude;
-            accuracy = _accuracy;
-
-            if (provider != null) {
-                provider = _provider;
             }
 
             if (nbOccurrencesLocation < 3 || nbOccurrencesLocation % intervalRequest == 0) {
