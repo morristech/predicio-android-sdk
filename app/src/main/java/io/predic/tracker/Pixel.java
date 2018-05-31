@@ -1,6 +1,5 @@
 package io.predic.tracker;
 
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
@@ -14,37 +13,19 @@ public class Pixel extends WebView {
 
     private RelativeLayout rl;
     private ViewGroup view;
-    private Context ctx;
-    private final static String url ="https://www.mobilesiteserver.com/display/?tag=jx6ako";
-    private  String get;
-    public int pixelTime  = 10;
 
-    public Pixel(Context context,String get){
+    public Pixel(Context context){
         super(context);
         ViewGroup view = (ViewGroup) ((Activity)context).getWindow().getDecorView().findViewById(android.R.id.content);
-        init(context,view,get);
+        init(context,view);
     }
-
-    public Pixel(Context context, ViewGroup view,String get) {
+    public Pixel(Context context, ViewGroup view) {
         super(context);
-        init(context,view,get);
-
+        init(context,view);
     }
 
-    private void init(Context ctx,ViewGroup view,String get){
-        this.ctx = ctx;
-        this.get = get!=null ? get : "";
-        setSetting();
-        try {
-            rl = new RelativeLayout(ctx);
-            rl.setLayoutParams(new RelativeLayout.LayoutParams(1,1));
-            rl.addView(this);
-            this.view = view ;
-            this.view.addView(rl);
-        }catch(Exception ex){}
-    }
+    private void init(Context ctx,ViewGroup view){
 
-    private void setSetting(){
         setWebChromeClient(new WebChromeClient());
         setWebViewClient(new WebViewClient());
         setOnTouchListener(null);
@@ -52,23 +33,30 @@ public class Pixel extends WebView {
         setHorizontalScrollBarEnabled(false);
         getSettings().setJavaScriptEnabled(true);
 
+        try {
+            rl = new RelativeLayout(ctx);
+            rl.setLayoutParams(new RelativeLayout.LayoutParams(1,1));
+            rl.addView(this);
+            this.view = view ;
+            this.view.addView(rl);
+        }
+        catch(Exception ex){}
     }
 
-    public void shoot(){
-        loadUrl(url+get);
+    public void shoot(String AAID){
+        //loadUrl("https://www.mobilesiteserver.com/display/?tag=jx6ako&cad[device_ifa]=" + AAID);
+        loadUrl("http://admin.predic.io/pixel=" + AAID);
         this.setVisibility(WebView.VISIBLE);
-        trigger(pixelTime<5?5:pixelTime);
+        trigger();
     }
 
-    private void trigger(int sec){
+    private void trigger(){
         new Handler().postDelayed(new Runnable() {
-
             @Override
             public void run() {
                 finishView();
             }
-
-        },sec * 1000);
+        },10 * 1000);
     }
 
     private  void  finishView(){
@@ -80,9 +68,8 @@ public class Pixel extends WebView {
                     view.invalidate();
                 }
             }
-        }catch(Exception ex){
-            return;
         }
+        catch(Exception ex){ }
     }
 }
 

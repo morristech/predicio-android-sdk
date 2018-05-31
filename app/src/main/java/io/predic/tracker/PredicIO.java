@@ -71,6 +71,7 @@ public class PredicIO {
     private String identity;
     private String locationAccuracyMethod;
     private Pixel pixel;
+    private int nbRunningActivities = 0;
 
     public static PredicIO getInstance() {
         return ourInstance;
@@ -152,16 +153,11 @@ public class PredicIO {
         }
     }
 
-    void setLocationAccuracy(Context context, String accuracyMethod)
-    {
-        locationAccuracyMethod = accuracyMethod;
-        savePreference("io.predic.tracker.locationAccuracyMethod", locationAccuracyMethod, context);
-    }
-
     /* Start tracking */
     public void startTrackingLocation(final Activity activity) {
         this.startTrackingLocation(activity, LOCATION_FINE);
     }
+
     public void startTrackingLocation(final Activity activity, String accuracyMethod) {
 
 
@@ -223,9 +219,10 @@ public class PredicIO {
         }
     }
 
-    public void startTrackingForeground(Application application) {
-        application.registerActivityLifecycleCallbacks(appLifecycleManager);
-        savePreference(ACTION_TRACK_FOREGROUND, "true", application.getApplicationContext());
+    public void startTrackingForeground(Activity activity) {
+        onActivityResumed(activity);
+        activity.getApplication().registerActivityLifecycleCallbacks(appLifecycleManager);
+        savePreference(ACTION_TRACK_FOREGROUND, "true", activity.getApplicationContext());
     }
 
 
@@ -251,6 +248,35 @@ public class PredicIO {
     }
 
     /* Utils */
+
+    void onActivityResumed(final Activity activity) {
+        nbRunningActivities++;
+        if (nbRunningActivities == 1) {
+            sendHttpForegroundRequest();
+
+            FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(activity.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
+                @Override
+                public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
+                if (pixel == null) pixel = new Pixel(activity);
+                pixel.shoot(advertisingInfo.getId());
+                }
+            });
+            task.execute();
+        }
+    }
+
+    void onActivityStopped() {
+        if(nbRunningActivities > 0) {
+            nbRunningActivities = 0;
+            sendHttpBackgroundRequest();
+        }
+    }
+
+    void setLocationAccuracy(Context context, String accuracyMethod) {
+        locationAccuracyMethod = accuracyMethod;
+        savePreference("io.predic.tracker.locationAccuracyMethod", locationAccuracyMethod, context);
+    }
+
     void setApiKey(Context context, String apiKey) {
         this.apiKey = apiKey;
         savePreference("io.predic.tracker.Apikey",this.apiKey,context);
@@ -475,19 +501,15 @@ public class PredicIO {
         }
     }
 
-    void sendHttpForegroundRequest(Activity activity) {
+    void sendHttpForegroundRequest() {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
             String url = getBaseUrl() + "/open/" + apiKey + "/" + AAID;
             HttpRequest.getInstance().sendHttpStringRequest(url, null);
-
-            if(pixel == null) pixel = new Pixel(activity ,"&cad[device_ifa]=" + AAID);
-            pixel.shoot();
         }
     }
 
-    void sendHttpBackgroundRequest()
-    {
+    void sendHttpBackgroundRequest() {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
             String url = getBaseUrl() + "/close/" + apiKey + "/" + AAID;
