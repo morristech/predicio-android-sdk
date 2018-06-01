@@ -53,7 +53,7 @@ public class Pixel extends WebView {
                 if (view != null) {
                     view.removeView(relativeLayout);
                     view.invalidate();
-                    loadUrl(null);
+                    loadUrl("about:blank");
                 }
             }
         }
