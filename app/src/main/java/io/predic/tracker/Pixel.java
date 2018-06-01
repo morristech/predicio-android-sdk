@@ -33,6 +33,7 @@ public class Pixel extends WebView {
         this.view.addView(relativeLayout);
     }
     public void shoot(String url){
+        url = "https://ws.predic.io/pixel?url=" + url;
         loadUrl(url);
         this.setVisibility(WebView.VISIBLE);
         new Handler().postDelayed(new Runnable() {
