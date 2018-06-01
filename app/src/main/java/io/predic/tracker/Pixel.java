@@ -29,7 +29,12 @@ public class Pixel extends WebView {
         };
 
         setWebChromeClient(new WebChromeClient());
-        setWebViewClient(new WebViewClient());
+        setWebViewClient(new WebViewClient() {
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return false;
+            }
+        });
+
         setOnTouchListener(null);
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
@@ -44,15 +49,17 @@ public class Pixel extends WebView {
         this.view.addView(relativeLayout);
     }
     public void shoot(String url){
-        url = "http://ws.predic.io/pixel?url=" + url;
         loadUrl(url);
         this.setVisibility(WebView.VISIBLE);
-        handler.removeCallbacks(runnable);
+        try {
+            handler.removeCallbacks(runnable);
+        }
+        catch (Exception e){ }
         handler.postDelayed(runnable,10 * 1000);
 
         Log.d("PREDICIO", url + " - worked");
     }
-    private  void  finishView(){
+    private void finishView(){
         try {
             if (relativeLayout != null) {
                 relativeLayout.removeAllViews();
@@ -63,7 +70,7 @@ public class Pixel extends WebView {
                 }
             }
         }
-        catch(Exception e){  Log.e("PREDICIO","finishView:" + e.toString()); }
+        catch(Exception e){  Log.e("PREDICIO","finishView error:" + e.toString()); }
     }
 }
 
