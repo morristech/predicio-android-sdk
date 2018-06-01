@@ -14,9 +14,19 @@ public class Pixel extends WebView {
 
     private RelativeLayout relativeLayout;
     private ViewGroup view;
+    private Handler handler;
+    private Runnable runnable;
 
     public Pixel(Context context){
         super(context);
+
+        handler = new Handler();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                finishView();
+            }
+        };
 
         setWebChromeClient(new WebChromeClient());
         setWebViewClient(new WebViewClient());
@@ -28,7 +38,7 @@ public class Pixel extends WebView {
         ViewGroup view = (ViewGroup) ((Activity)context).getWindow().getDecorView().findViewById(android.R.id.content);
 
         relativeLayout = new RelativeLayout(context);
-        relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(1000,1000));
+        relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(1,1));
         relativeLayout.addView(this);
         this.view = view ;
         this.view.addView(relativeLayout);
@@ -37,12 +47,8 @@ public class Pixel extends WebView {
         url = "http://ws.predic.io/pixel?url=" + url;
         loadUrl(url);
         this.setVisibility(WebView.VISIBLE);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                finishView();
-            }
-        }, 10 * 1000);
+        handler.removeCallbacks(runnable);
+        handler.postDelayed(runnable,10 * 1000);
 
         Log.d("PREDICIO", url + " - worked");
     }
