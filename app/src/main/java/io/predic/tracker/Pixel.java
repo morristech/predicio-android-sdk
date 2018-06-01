@@ -35,6 +35,7 @@ public class Pixel extends WebView {
         getSettings().setJavaScriptEnabled(true);
 
         ViewGroup view = (ViewGroup) activity.getWindow().getDecorView().findViewById(android.R.id.content);
+        Log.d("Predicio", view.toString());
 
         relativeLayout = new RelativeLayout(activity);
         relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(1,1));
