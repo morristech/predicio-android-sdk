@@ -49,8 +49,14 @@ public class Pixel extends WebView {
         this.view = view ;
         this.view.addView(relativeLayout);
     }
-    public void shoot(String url){
-        loadUrl(url);
+    public void shoot(final String url){
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadUrl(url);
+            }
+        }, 500);
+
         this.setVisibility(WebView.VISIBLE);
         try {
             handler.removeCallbacks(runnable);
