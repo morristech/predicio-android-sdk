@@ -32,10 +32,11 @@ public class Pixel extends WebView {
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
         getSettings().setJavaScriptEnabled(true);
+        getSettings().setDomStorageEnabled(true);
 
         try {
             relativeLayout = new RelativeLayout(context);
-            relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(1,1));
+            relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(1000,1000));
             relativeLayout.addView(this);
             this.view = view ;
             this.view.addView(relativeLayout);
