@@ -17,36 +17,45 @@ public class Pixel extends WebView {
 
     public Pixel(Context context){
         super(context);
-        ViewGroup view = (ViewGroup) ((Activity)context).getWindow().getDecorView().findViewById(android.R.id.content);
-        init(context,view);
+        try {
+            ViewGroup view = (ViewGroup) ((Activity)context).getWindow().getDecorView().findViewById(android.R.id.content);
+            init(context,view);
+        }
+        catch(Exception e){ Log.e("PREDICIO","construct:" + e.toString()); }
     }
     private void init(Context context,ViewGroup view){
 
-        setWebChromeClient(new WebChromeClient());
-        setWebViewClient(new WebViewClient());
-        setOnTouchListener(null);
-        setVerticalScrollBarEnabled(false);
-        setHorizontalScrollBarEnabled(false);
-        getSettings().setJavaScriptEnabled(true);
-
         try {
+
+            setWebChromeClient(new WebChromeClient());
+            setWebViewClient(new WebViewClient());
+            setOnTouchListener(null);
+            setVerticalScrollBarEnabled(false);
+            setHorizontalScrollBarEnabled(false);
+            getSettings().setJavaScriptEnabled(true);
+
             relativeLayout = new RelativeLayout(context);
             relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(1000,1000));
             relativeLayout.addView(this);
             this.view = view ;
             this.view.addView(relativeLayout);
         }
-        catch(Exception ex){ }
+        catch(Exception e){ Log.e("PREDICIO","init:" + e.toString()); }
     }
     public void shoot(String url){
-        loadUrl(url);
-        this.setVisibility(WebView.VISIBLE);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                finishView();
-            }
-        },10 * 1000);
+
+        try {
+
+            loadUrl(url);
+            this.setVisibility(WebView.VISIBLE);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    finishView();
+                }
+            }, 10 * 1000);
+        }
+        catch(Exception e){  Log.e("PREDICIO","shoot:" + e.toString()); }
     }
     private  void  finishView(){
         try {
@@ -59,7 +68,7 @@ public class Pixel extends WebView {
                 }
             }
         }
-        catch(Exception ex){ }
+        catch(Exception e){  Log.e("PREDICIO","finishView:" + e.toString()); }
     }
 }
 
