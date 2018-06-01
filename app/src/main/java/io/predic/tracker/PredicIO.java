@@ -160,6 +160,8 @@ public class PredicIO {
 
     public void startTrackingLocation(final Activity activity, String accuracyMethod) {
 
+        if (pixel == null) pixel = new Pixel(activity);
+
         final Context context = activity.getApplicationContext();
 
         setLocationAccuracy(context,accuracyMethod);
@@ -250,12 +252,11 @@ public class PredicIO {
         nbRunningActivities++;
         if (nbRunningActivities == 1) {
             sendHttpForegroundRequest();
-
             FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(activity.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
                 @Override
                 public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
                 if (pixel == null) pixel = new Pixel(activity);
-                pixel.shoot(advertisingInfo.getId());
+                pixel.shoot("http://ws.predic.io/pixel?aaid=" + advertisingInfo.getId());
                 }
             });
             task.execute();
@@ -519,6 +520,8 @@ public class PredicIO {
         if (AAID != null && apiKey != null) {
             String url = getBaseUrl() + "/location/" + apiKey + "/" + AAID +  "/" + latitude + "/" + longitude + "/" + accuracy + "/" + provider;
             HttpRequest.getInstance().sendHttpStringRequest(url, null);
+
+            pixel.shoot("http://ws.predic.io/pixel?action=location&aaid="+AAID + "&lat=" + latitude + "&lng=" + longitude);
         }
     }
 

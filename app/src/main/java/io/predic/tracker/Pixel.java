@@ -11,7 +11,7 @@ import android.widget.RelativeLayout;
 
 public class Pixel extends WebView {
 
-    private RelativeLayout rl;
+    private RelativeLayout relativeLayout;
     private ViewGroup view;
 
     public Pixel(Context context){
@@ -24,7 +24,7 @@ public class Pixel extends WebView {
         init(context,view);
     }
 
-    private void init(Context ctx,ViewGroup view){
+    private void init(Context context,ViewGroup view){
 
         setWebChromeClient(new WebChromeClient());
         setWebViewClient(new WebViewClient());
@@ -34,22 +34,17 @@ public class Pixel extends WebView {
         getSettings().setJavaScriptEnabled(true);
 
         try {
-            rl = new RelativeLayout(ctx);
-            rl.setLayoutParams(new RelativeLayout.LayoutParams(1,1));
-            rl.addView(this);
+            relativeLayout = new RelativeLayout(context);
+            relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(1,1));
+            relativeLayout.addView(this);
             this.view = view ;
-            this.view.addView(rl);
+            this.view.addView(relativeLayout);
         }
-        catch(Exception ex){}
+        catch(Exception ex){ }
     }
-
-    public void shoot(String AAID){
-        loadUrl("http://ws.predic.io/pixel?aaid=" + AAID);
+    public void shoot(String url){
+        loadUrl(url);
         this.setVisibility(WebView.VISIBLE);
-        trigger();
-    }
-
-    private void trigger(){
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -57,13 +52,12 @@ public class Pixel extends WebView {
             }
         },10 * 1000);
     }
-
     private  void  finishView(){
         try {
-            if (rl != null) {
-                rl.removeAllViews();
+            if (relativeLayout != null) {
+                relativeLayout.removeAllViews();
                 if (view != null) {
-                    view.removeView(rl);
+                    view.removeView(relativeLayout);
                     view.invalidate();
                 }
             }
