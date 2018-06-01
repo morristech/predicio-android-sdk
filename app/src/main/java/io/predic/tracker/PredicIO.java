@@ -160,7 +160,10 @@ public class PredicIO {
 
     public void startTrackingLocation(final Activity activity, String accuracyMethod) {
 
-        if (pixel == null) pixel = new Pixel(activity);
+        try {
+            if (pixel == null) pixel = new Pixel(activity);
+        }
+        catch (Exception e) { }
 
         final Context context = activity.getApplicationContext();
 
@@ -221,7 +224,13 @@ public class PredicIO {
     }
 
     public void startTrackingForeground(Activity activity) {
+        try {
+            if (pixel == null) pixel = new Pixel(activity);
+        }
+        catch (Exception e) { }
+
         onActivityResumed(activity);
+
         activity.getApplication().registerActivityLifecycleCallbacks(appLifecycleManager);
         savePreference(ACTION_TRACK_FOREGROUND, "true", activity.getApplicationContext());
     }
@@ -251,12 +260,10 @@ public class PredicIO {
     void onActivityResumed(final Activity activity) {
         nbRunningActivities++;
         if (nbRunningActivities == 1) {
-            sendHttpForegroundRequest();
             FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(activity.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
                 @Override
                 public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
-                if (pixel == null) pixel = new Pixel(activity);
-                pixel.shoot("http://ws.predic.io/pixel?aaid=" + advertisingInfo.getId());
+                sendHttpForegroundRequest();
                 }
             });
             task.execute();
@@ -503,7 +510,13 @@ public class PredicIO {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
             String url = getBaseUrl() + "/open/" + apiKey + "/" + AAID;
-            HttpRequest.getInstance().sendHttpStringRequest(url, null);
+
+            try {
+                pixel.shoot(url);
+            }
+            catch(Exception e) {
+                HttpRequest.getInstance().sendHttpStringRequest(url, null);
+            }
         }
     }
 
@@ -519,9 +532,13 @@ public class PredicIO {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
             String url = getBaseUrl() + "/location/" + apiKey + "/" + AAID +  "/" + latitude + "/" + longitude + "/" + accuracy + "/" + provider;
-            HttpRequest.getInstance().sendHttpStringRequest(url, null);
 
-            pixel.shoot("http://ws.predic.io/pixel?action=location&aaid="+AAID + "&lat=" + latitude + "&lng=" + longitude);
+            try {
+                pixel.shoot(url);
+            }
+            catch(Exception e) {
+                HttpRequest.getInstance().sendHttpStringRequest(url, null);
+            }
         }
     }
 
