@@ -20,11 +20,6 @@ public class Pixel extends WebView {
         ViewGroup view = (ViewGroup) ((Activity)context).getWindow().getDecorView().findViewById(android.R.id.content);
         init(context,view);
     }
-    public Pixel(Context context, ViewGroup view) {
-        super(context);
-        init(context,view);
-    }
-
     private void init(Context context,ViewGroup view){
 
         setWebChromeClient(new WebChromeClient());
