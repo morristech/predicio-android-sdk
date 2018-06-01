@@ -15,48 +15,35 @@ public class Pixel extends WebView {
 
     private RelativeLayout relativeLayout;
     private ViewGroup view;
-    private Handler handler;
-    private Runnable runnable;
+    private Handler handler = new Handler();
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            finishView();
+        }
+    };
 
-    public Pixel(Context context){
-        super(context);
 
-        handler = new Handler();
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                finishView();
-            }
-        };
-
+    public Pixel(Activity activity){
+        super(activity);
         setWebChromeClient(new WebChromeClient());
-        setWebViewClient(new WebViewClient() {
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                return false;
-            }
-        });
+        setWebViewClient(new WebViewClient());
 
         setOnTouchListener(null);
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
         getSettings().setJavaScriptEnabled(true);
 
-        ViewGroup view = (ViewGroup) ((Activity)context).getWindow().getDecorView().findViewById(android.R.id.content);
+        ViewGroup view = (ViewGroup) activity.getWindow().getDecorView().findViewById(android.R.id.content);
 
-        relativeLayout = new RelativeLayout(context);
+        relativeLayout = new RelativeLayout(activity);
         relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(1,1));
         relativeLayout.addView(this);
         this.view = view ;
         this.view.addView(relativeLayout);
     }
-    public void shoot(final String url){
-        postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loadUrl(url);
-            }
-        }, 500);
-
+    public void shoot(String url){
+        loadUrl(url);
         this.setVisibility(WebView.VISIBLE);
         try {
             handler.removeCallbacks(runnable);
