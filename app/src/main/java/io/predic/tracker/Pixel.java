@@ -3,6 +3,7 @@ package io.predic.tracker;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -32,7 +33,6 @@ public class Pixel extends WebView {
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
         getSettings().setJavaScriptEnabled(true);
-        getSettings().setDomStorageEnabled(true);
 
         try {
             relativeLayout = new RelativeLayout(context);
@@ -58,6 +58,7 @@ public class Pixel extends WebView {
             if (relativeLayout != null) {
                 relativeLayout.removeAllViews();
                 if (view != null) {
+                    Log.d("Predicio", "invalidate");
                     view.removeView(relativeLayout);
                     view.invalidate();
                 }
