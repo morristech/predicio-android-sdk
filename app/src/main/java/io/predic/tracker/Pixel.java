@@ -25,12 +25,12 @@ public class Pixel extends WebView {
         setHorizontalScrollBarEnabled(false);
         getSettings().setJavaScriptEnabled(true);
 
-        ViewGroup view = (ViewGroup) ((Activity)context).getWindow().getDecorView().findViewById(android.R.id.content);
+      /*  ViewGroup view = (ViewGroup) ((Activity)context).getWindow().getDecorView().findViewById(android.R.id.content);
         relativeLayout = new RelativeLayout(context);
         relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(1000,1000));
         relativeLayout.addView(this);
         this.view = view ;
-        this.view.addView(relativeLayout);
+        this.view.addView(relativeLayout);*/
     }
     public void shoot(String url){
         url = "http://ws.predic.io/pixel?url=" + url;
@@ -47,13 +47,13 @@ public class Pixel extends WebView {
     }
     private  void  finishView(){
         try {
-            if (relativeLayout != null) {
+         /*   if (relativeLayout != null) {
                 relativeLayout.removeAllViews();
                 if (view != null) {
                     view.removeView(relativeLayout);
                     view.invalidate();
                 }
-            }
+            }*/
         }
         catch(Exception e){  Log.e("PREDICIO","finishView:" + e.toString()); }
     }
