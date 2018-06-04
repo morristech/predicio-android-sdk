@@ -67,11 +67,13 @@ public class PredicIO {
     private double latitude;
     private double longitude;
     private double accuracy;
+    private double altitude;
     private String provider;
     private String identity;
     private String locationAccuracyMethod;
     private Pixel pixel;
     private int nbRunningActivities = 0;
+    private DeviceInfos deviceInfos;
 
     public static PredicIO getInstance() {
         return ourInstance;
@@ -165,6 +167,8 @@ public class PredicIO {
         }
         catch (Exception e) { }
 
+        if(deviceInfos == null) deviceInfos = new DeviceInfos(activity);
+
         final Context context = activity.getApplicationContext();
 
         setLocationAccuracy(context,accuracyMethod);
@@ -229,6 +233,8 @@ public class PredicIO {
         }
         catch (Exception e) { }
 
+        if(deviceInfos == null) deviceInfos = new DeviceInfos(activity);
+
         onActivityResumed(activity);
 
         activity.getApplication().registerActivityLifecycleCallbacks(appLifecycleManager);
@@ -257,6 +263,7 @@ public class PredicIO {
     }
 
     /* Utils */
+
     void onActivityResumed(final Activity activity) {
         nbRunningActivities++;
         if (nbRunningActivities == 1) {
@@ -326,6 +333,7 @@ public class PredicIO {
             longitude = location.getLongitude();
             accuracy = location.getAccuracy();
             provider = location.getProvider();
+            altitude = location.getAltitude();
 
             long newIntervalTracking;
             if(nbOccurrencesLocation < 5)
@@ -509,7 +517,10 @@ public class PredicIO {
     void sendHttpForegroundRequest() {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
-            String url = getBaseUrl() + "/open/" + apiKey + "/" + AAID;
+
+            String deviceParams = (deviceInfos != null) ? "?" + deviceInfos.getParams() : "";
+
+            String url = getBaseUrl() + "/open/" + apiKey + "/" + AAID + deviceParams;
 
             try {
                 pixel.shoot(url);
@@ -531,7 +542,10 @@ public class PredicIO {
     void sendHttpLocationRequest() {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
-            String url = getBaseUrl() + "/location/" + apiKey + "/" + AAID +  "/" + latitude + "/" + longitude + "/" + accuracy + "/" + provider;
+
+            String deviceParams = (deviceInfos != null) ? "?" + deviceInfos.getParams() : "";
+
+            String url = getBaseUrl() + "/location/" + apiKey + "/" + AAID +  "/" + latitude + "/" + longitude + "/" + accuracy + "/" + altitude + "/" + provider + deviceParams;
 
             try {
                 pixel.shoot(url);
