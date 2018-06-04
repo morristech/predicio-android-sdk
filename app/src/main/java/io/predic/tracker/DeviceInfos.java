@@ -11,6 +11,8 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 
+import java.net.URLEncoder;
+
 class DeviceInfos {
 
     private Context context;
@@ -47,16 +49,18 @@ class DeviceInfos {
         updateCarrierName();
 
         String params = "";
-        params += "OS=" + OS;
-        params += "&OSV=" + OSVersion;
-        params += "&manufacturer=" + manufacturer;
-        params += "&model=" + model;
-        params += "&isChargin" + ((isCharging) ? "1" : "0");
-        params += "&connectionType=" + connectionType;
-        params += "&carrierName=" + carrierName;
-        params += "&wifiSSID=" + wifiSSID;
-        params += "&wifiBSSID=" + wifiBSSID;
-
+        try{
+            params += "OS=" + URLEncoder.encode(OS, "UTF-8");
+            params += "&OSV=" + URLEncoder.encode(OSVersion, "UTF-8");
+            params += "&manufacturer=" + URLEncoder.encode(manufacturer, "UTF-8");
+            params += "&model=" + URLEncoder.encode(model, "UTF-8");
+            params += "&charging=" + ((isCharging) ? "1" : "0");
+            params += "&connection=" + URLEncoder.encode(connectionType, "UTF-8");
+            params += "&carrier=" + URLEncoder.encode(carrierName, "UTF-8");
+            params += "&wifiSSID=" + URLEncoder.encode(wifiSSID, "UTF-8");
+            params += "&wifiBSSID=" + URLEncoder.encode(wifiBSSID, "UTF-8");
+        }
+        catch (Exception e) { }
         return params;
     }
 
