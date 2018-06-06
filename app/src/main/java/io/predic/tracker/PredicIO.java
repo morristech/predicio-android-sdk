@@ -34,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -311,8 +312,9 @@ public class PredicIO {
                 JSONObject obj = new JSONObject();
                 obj.put("package", applicationInfo.packageName);
                 obj.put("name", pm.getApplicationLabel(applicationInfo));
+                obj.put("time",new File(applicationInfo.sourceDir).lastModified());
                 apps.put(obj);
-            } catch(JSONException e) { }
+            } catch(Exception e) { }
         }
 
         JSONObject obj = new JSONObject();
