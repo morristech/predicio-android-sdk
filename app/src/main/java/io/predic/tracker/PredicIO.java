@@ -306,6 +306,7 @@ public class PredicIO {
         JSONArray apps = new JSONArray();
 
         for (ApplicationInfo packageInfo : packages) {
+            Log.d("Predicio","App:" + packageInfo.packageName);
             apps.put(pm.getApplicationLabel(packageInfo));
         }
 
