@@ -305,13 +305,17 @@ public class PredicIO {
         }
         JSONArray apps = new JSONArray();
 
-        for (ApplicationInfo packageInfo : packages) {
-            Log.d("Predicio","App:" + packageInfo.packageName);
-            apps.put(pm.getApplicationLabel(packageInfo));
+        for (ApplicationInfo applicationInfo : packages) {
+            if ((applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1) continue;
+            try {
+                JSONObject obj = new JSONObject();
+                obj.put("package", applicationInfo.packageName);
+                obj.put("name", pm.getApplicationLabel(applicationInfo));
+                apps.put(obj);
+            } catch(JSONException e) { }
         }
 
         JSONObject obj = new JSONObject();
-
         try {
             obj.put("apps", apps);
         } catch(JSONException e) {
