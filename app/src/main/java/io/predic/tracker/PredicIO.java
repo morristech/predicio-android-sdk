@@ -72,6 +72,7 @@ public class PredicIO {
     private String provider;
     private String identity;
     private String locationAccuracyMethod;
+    private int minMoveDistance =  10;
     private Pixel pixel;
     private int nbRunningActivities = 0;
     private DeviceInfos deviceInfos;
@@ -286,7 +287,7 @@ public class PredicIO {
     }
 
     void setLocationAccuracy(Context context, String accuracyMethod) {
-        locationAccuracyMethod = accuracyMethod;
+        locationAccuracyMethod = (accuracyMethod == null) ? LOCATION_FINE : accuracyMethod;
         savePreference("io.predic.tracker.locationAccuracyMethod", locationAccuracyMethod, context);
     }
 
@@ -334,7 +335,8 @@ public class PredicIO {
             _latitude = location.getLatitude();
             _longitude = location.getLongitude();
 
-            nbOccurrencesLocation = isSameLocation(_latitude, _longitude) ? nbOccurrencesLocation + 1 : 0;
+            boolean move = (getDistance(_latitude,_longitude,latitude,longitude) > (minMoveDistance/1000));
+            nbOccurrencesLocation = (move) ? 0 : nbOccurrencesLocation + 1;
 
             latitude = location.getLatitude();
             longitude = location.getLongitude();
@@ -342,21 +344,29 @@ public class PredicIO {
             provider = location.getProvider();
             altitude = location.getAltitude();
 
+            String priority = locationAccuracyMethod;
+
             long newIntervalTracking;
-            if(nbOccurrencesLocation < 5)
+            if(nbOccurrencesLocation < 5) {
                 newIntervalTracking = 60000;
-            else if(nbOccurrencesLocation < 30)
-                newIntervalTracking = 3*60000;
-            else if(nbOccurrencesLocation < 60)
-                newIntervalTracking = 5*60000;
-            else
-                newIntervalTracking = 10*60000;
+                minMoveDistance = 10;
+            }
+            else if(nbOccurrencesLocation < 30) {
+                newIntervalTracking = 5 * 60000;
+                minMoveDistance = 100;
+                priority = LOCATION_COARSE;
+            }
+            else {
+                newIntervalTracking = 10 * 60000;
+                minMoveDistance = 200;
+                priority = LOCATION_COARSE;
+            }
 
             int intervalRequest = nbOccurrencesLocation < 15 ? 5 : 15;
 
             if(newIntervalTracking != intervalTracking) {
                 intervalTracking = newIntervalTracking;
-                improveTrackingLocation(context, intervalTracking);
+                improveTrackingLocation(context, intervalTracking, priority);
             }
 
             if (nbOccurrencesLocation < 3 || nbOccurrencesLocation % intervalRequest == 0) {
@@ -384,13 +394,13 @@ public class PredicIO {
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
                 AAID = advertisingInfo.getId();
                 startService(context, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
-                improveTrackingLocation(context, 60000);
+                improveTrackingLocation(context, 60000, locationAccuracyMethod);
             }
         });
         task.execute();
     }
 
-    private void improveTrackingLocation(Context context, long interval) {
+    private void improveTrackingLocation(Context context, long interval, String priority) {
         int permissionCheck = ContextCompat.checkSelfPermission(context.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
 
@@ -409,16 +419,12 @@ public class PredicIO {
                 mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
             }
 
-            if(locationAccuracyMethod == null) {
-                setLocationAccuracy(context, LOCATION_FINE);
-            }
-
-            Log.d("PREDICIO","Location interval: "+interval + ", Location method: " + locationAccuracyMethod);
+            Log.d("PREDICIO","Location interval: "+interval + ", minMoveDistance: "+ minMoveDistance + ", Location method: " + priority);
 
             LocationRequest mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(interval);
             mLocationRequest.setFastestInterval(5000);
-            mLocationRequest.setPriority((locationAccuracyMethod.equals(LOCATION_FINE)) ? LocationRequest.PRIORITY_HIGH_ACCURACY : LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+            mLocationRequest.setPriority((priority.equals(LOCATION_FINE)) ? LocationRequest.PRIORITY_HIGH_ACCURACY : LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
 
@@ -428,8 +434,8 @@ public class PredicIO {
     private double getDistance(double lat1, double lng1, double lat2, double lng2) {
         double earthRadius = 6371; // in km, change to 3958.75 for miles output
 
-        double dLat = Math.toRadians(lat2-lat1);
-        double dLng = Math.toRadians(lng2-lng1);
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lng2 - lng1);
 
         double sindLat = Math.sin(dLat / 2);
         double sindLng = Math.sin(dLng / 2);
@@ -437,15 +443,11 @@ public class PredicIO {
         double a = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
                 * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
 
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         double dist = earthRadius * c;
 
         return dist; // output distance, in KM
-    }
-
-    private boolean isSameLocation(double lat, double lon) {
-        return getDistance(lat, lon, latitude, longitude) < 0.01;
     }
 
     private String getBaseUrl() {
