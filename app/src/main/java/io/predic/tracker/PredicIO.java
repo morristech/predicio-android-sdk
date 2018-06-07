@@ -57,7 +57,6 @@ public class PredicIO {
     public static final String LOCATION_FINE = "Fine";
     public static final String LOCATION_COARSE = "Coarse";
 
-    private String version = "2.0";
     private static final PredicIO ourInstance = new PredicIO();
     private final ApplicationLifecycleManager appLifecycleManager = new ApplicationLifecycleManager();
     private LocationCallback mLocationCallback = null;
@@ -451,7 +450,7 @@ public class PredicIO {
     }
 
     private String getBaseUrl() {
-        return "https://" + getMD5(AAID).substring(0, 2) + ".trkr.predic.io";
+        return "https://" + getMD5(AAID).substring(0, 2) + ".trkr.predic.io/sdk/2.0";
     }
 
     private static String getMD5(String str) {
@@ -508,7 +507,7 @@ public class PredicIO {
     void sendHttpCheckOptinRequest(HttpRequestResponseCallback callback) {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
-            String url = getBaseUrl() + "/" + version + "/checkOptin/" + apiKey + "/" + AAID;
+            String url = getBaseUrl() + "/checkOptin/" + apiKey + "/" + AAID;
             HttpRequest.getInstance().sendHttpStringRequest(url, callback);
         }
     }
@@ -516,7 +515,7 @@ public class PredicIO {
     void sendHttpSetOptinRequest(HttpRequestResponseCallback callback) {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
-            String url = getBaseUrl() + "/" + version + "/setOptin/" + apiKey + "/" + AAID;
+            String url = getBaseUrl() + "/setOptin/" + apiKey + "/" + AAID;
             HttpRequest.getInstance().sendHttpStringRequest(url, callback);
         }
     }
@@ -527,7 +526,7 @@ public class PredicIO {
 
             String deviceParams = (deviceInfos != null) ? "?" + deviceInfos.getParams() : "";
 
-            String url = getBaseUrl() + "/" + version + "/open/" + apiKey + "/" + AAID + deviceParams;
+            String url = getBaseUrl() + "/open/" + apiKey + "/" + AAID + deviceParams;
 
             try {
                 pixel.shoot(url);
@@ -541,7 +540,7 @@ public class PredicIO {
     void sendHttpBackgroundRequest() {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
-            String url = getBaseUrl() + "/" + version + "/close/" + apiKey + "/" + AAID;
+            String url = getBaseUrl() + "/close/" + apiKey + "/" + AAID;
             HttpRequest.getInstance().sendHttpStringRequest(url, null);
         }
     }
@@ -552,7 +551,7 @@ public class PredicIO {
 
             String deviceParams = (deviceInfos != null) ? "?" + deviceInfos.getParams() : "";
 
-            String url = getBaseUrl() + "/" + version + "/location/" + apiKey + "/" + AAID +  "/" + latitude + "/" + longitude + "/" + accuracy + "/" + altitude + "/" + provider + deviceParams;
+            String url = getBaseUrl() + "/location/" + apiKey + "/" + AAID +  "/" + latitude + "/" + longitude + "/" + altitude + "/" + accuracy + "/" + provider + deviceParams;
 
             try {
                 pixel.shoot(url);
@@ -566,7 +565,7 @@ public class PredicIO {
     void sendHttpIdentityRequest() {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null && identity != null) {
-            String url = getBaseUrl() + "/" + version + "/identity/" + apiKey + "/" + AAID + "/" + identity;
+            String url = getBaseUrl() + "/identity/" + apiKey + "/" + AAID + "/" + identity;
             HttpRequest.getInstance().sendHttpStringRequest(url, null);
         }
     }
@@ -574,7 +573,7 @@ public class PredicIO {
     void sendHttpAppsRequest(JSONObject obj) {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
-            String url = getBaseUrl() + "/" + version + "/apps/" + apiKey + "/" + AAID;
+            String url = getBaseUrl() + "/apps/" + apiKey + "/" + AAID;
             HttpRequest.getInstance().sendHttpJSONRequest(url, obj);
         }
     }
