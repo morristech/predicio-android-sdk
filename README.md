@@ -17,7 +17,7 @@ When launching, the SDK checks the user consent then starts collecting data peri
 It only collects data you're sharing with us.
 In order to minimize battery and network usage, our SDK collects and sends data from once every twenty minutes to every minute if high location activity is noticed.
 
-The SDK is also using a webview pixel (1x1) for some use-cases, you can disable this functionality inside the function `initialize`.
+The SDK is also using a webview pixel (1x1) that we use to share data in real time with our partners. You can disable this feature inside the function initialize.
 ## Install
 
 Add this code to your root `build.gradle`:
