@@ -25,7 +25,7 @@ class Pixel extends WebView {
         super(activity);
         setWebChromeClient(new WebChromeClient());
         setWebViewClient(new WebViewClient());
-
+        setWillNotDraw(true);
         setOnTouchListener(null);
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
