@@ -28,33 +28,40 @@ public class PredicIOReceiver extends BroadcastReceiver {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         String apiKey = settings.getString("io.predic.tracker.Apikey", null);
         String identity = settings.getString("io.predic.tracker.Identity", null);
+        String locationMethod = settings.getString("io.predic.tracker.locationAccuracyMethod", null);
         PredicIO.getInstance().setApiKey(context, apiKey);
         PredicIO.getInstance().setIdentity(context, identity);
+        PredicIO.getInstance().setLocationAccuracy(context, locationMethod);
 
         if (intent.getAction().equals(PredicIO.ACTION_TRACK_APPS)) {
             JSONObject obj = PredicIO.getInstance().getJSONObjectApps(context);
-            if (obj != null) {
-                PredicIO.getInstance().sendHttpAppsRequest(obj);
-            }
-        } else if (intent.getAction().equals(PredicIO.ACTION_TRACK_IDENTITY)) {
+            if (obj != null) PredicIO.getInstance().sendHttpAppsRequest(obj);
+        }
+        else if (intent.getAction().equals(PredicIO.ACTION_TRACK_APPS)) {
+            JSONObject obj = PredicIO.getInstance().getJSONObjectApps(context);
+            if (obj != null) PredicIO.getInstance().sendHttpAppsRequest(obj);
+        }
+        else if (intent.getAction().equals(PredicIO.ACTION_TRACK_IDENTITY)) {
             PredicIO.getInstance().sendHttpIdentityRequest();
-        } else if (intent.getAction().equals(PredicIO.ACTION_TRACK_LOCATION)) {
+        }
+        else if (intent.getAction().equals(PredicIO.ACTION_TRACK_LOCATION)) {
             try {
                 FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
                 mFusedLocationClient.getLastLocation()
-                        .addOnSuccessListener(new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                // Got last known location. In some rare situations this can be null.
-                                if (location != null) {
-                                    PredicIO.getInstance().receiveLocation(context,location);
-                                }
+                    .addOnSuccessListener(new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                PredicIO.getInstance().receiveLocation(context,location);
                             }
-                        });
+                        }
+                    });
             } catch(SecurityException e) {
                 Log.e("PREDICIO", "Location permissions not accepted");
             }
-        } else if (intent.getAction().equals(ACTION_BOOT_COMPLETED)) {
+        }
+        else if (intent.getAction().equals(ACTION_BOOT_COMPLETED)) {
             String trackingLocation = settings.getString(PredicIO.ACTION_TRACK_LOCATION, null);
             String trackingApps = settings.getString(PredicIO.ACTION_TRACK_APPS, null);
             String trackingIdentity = settings.getString(PredicIO.ACTION_TRACK_IDENTITY, null);

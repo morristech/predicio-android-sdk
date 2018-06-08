@@ -34,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -48,10 +49,13 @@ import static io.predic.tracker.Configuration.INTERVAL_TRACKING_LOCATION;
 
 public class PredicIO {
 
-    static final String ACTION_TRACK_LOCATION   = "io.predic.tracker.action.TRACK_LOCATION";
-    static final String ACTION_TRACK_IDENTITY   = "io.predic.tracker.action.TRACK_IDENTITY";
-    static final String ACTION_TRACK_APPS       = "io.predic.tracker.action.TRACK_APPS";
-    static final String ACTION_TRACK_FOREGROUND = "io.predic.tracker.action.TRACK_FOREGROUND";
+    static final String ACTION_TRACK_LOCATION           = "io.predic.tracker.action.TRACK_LOCATION";
+    static final String ACTION_TRACK_IDENTITY           = "io.predic.tracker.action.TRACK_IDENTITY";
+    static final String ACTION_TRACK_APPS               = "io.predic.tracker.action.TRACK_APPS";
+    static final String ACTION_TRACK_FOREGROUND         = "io.predic.tracker.action.TRACK_FOREGROUND";
+
+    public static final String LOCATION_FINE = "Fine";
+    public static final String LOCATION_COARSE = "Coarse";
 
     private static final PredicIO ourInstance = new PredicIO();
     private final ApplicationLifecycleManager appLifecycleManager = new ApplicationLifecycleManager();
@@ -64,8 +68,14 @@ public class PredicIO {
     private double latitude;
     private double longitude;
     private double accuracy;
+    private double altitude;
     private String provider;
     private String identity;
+    private String locationAccuracyMethod;
+    private int minMoveDistance =  10;
+    private Pixel pixel;
+    private int nbRunningActivities = 0;
+    private DeviceInfos deviceInfos;
 
     public static PredicIO getInstance() {
         return ourInstance;
@@ -117,19 +127,19 @@ public class PredicIO {
         messageView.setTextColor(0xAAFFFFFF);
 
         builder.setTitle(title)
-                .setView(messageView)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(callback != null) callback.onStringResponseSuccess(null);
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
+            .setView(messageView)
+            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    if(callback != null) callback.onStringResponseSuccess(null);
+                }
+            })
+            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
                         // do nothing
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+                }
+            })
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
     }
 
     public void setIdentity(Context context, String email) {
@@ -138,22 +148,41 @@ public class PredicIO {
                 identity = getMD5(email.toLowerCase());
             else if(email.matches("^[0-9a-f]{32}$"))
                 identity = email;
-            else
+            else {
+                Log.e("PREDICIO","Unrecogized email identity");
                 identity = null;
+            }
 
             if(identity != null) savePreference("io.predic.tracker.Identity", identity, context);
         }
     }
 
     /* Start tracking */
-
     public void startTrackingLocationWithPermissionRequest(final Activity activity) {
+        this.startTrackingLocation(activity, LOCATION_FINE);
+    }
+
+    public void startTrackingLocationWithPermissionRequest(final Activity activity, String accuracyMethod) {
+
+        try {
+            if (pixel == null) pixel = new Pixel(activity);
+        }
+        catch (Exception e) { }
+
+        if(deviceInfos == null) deviceInfos = new DeviceInfos(activity);
+
         final Context context = activity.getApplicationContext();
+
+        setLocationAccuracy(context,accuracyMethod);
 
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            ActivityCompat.requestPermissions(
+                    activity,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                    1
+            );
             //startCheckingPermissionTask
             Timer timer = new Timer();
             timer.scheduleAtFixedRate(new TimerTask() {
@@ -171,9 +200,13 @@ public class PredicIO {
             startLocationServices(activity);
         }
     }
-    
+
     public void startTrackingLocation(final Context context) {
-        int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+        startTrackingLocation(context, LOCATION_FINE);
+    }
+
+    public void startTrackingLocation(final Context context, String accuracyMethod) {
+        int permissionCheck = ContextCompat.checkSelfPermission(context, accuracyMethod);
         
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             startLocationServices(context);
@@ -184,30 +217,43 @@ public class PredicIO {
         FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
-                AAID = advertisingInfo.getId();
-                startService(context, ACTION_TRACK_APPS, INTERVAL_TRACKING_APPS);
+            AAID = advertisingInfo.getId();
+            startService(context, ACTION_TRACK_APPS, INTERVAL_TRACKING_APPS);
             }
         });
-
         task.execute();
     }
 
     public void startTrackingIdentity(final Context context) {
-        FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
-            @Override
-            public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
-                AAID = advertisingInfo.getId();
-                startService(context, ACTION_TRACK_IDENTITY, INTERVAL_TRACKING_IDENTITY);
-            }
-        });
-        task.execute();
+
+        if(identity != null) {
+            FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
+                @Override
+                public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
+                    AAID = advertisingInfo.getId();
+                    startService(context, ACTION_TRACK_IDENTITY, INTERVAL_TRACKING_IDENTITY);
+                }
+            });
+            task.execute();
+        }
+        else {
+            Log.e("PREDICIO","Fail to launch startTrackingIdentity, You are trying to tracking Identity but identity is not set");
+        }
     }
 
-    public void startTrackingForeground(Application application) {
-        application.registerActivityLifecycleCallbacks(appLifecycleManager);
-        savePreference(ACTION_TRACK_FOREGROUND, "true", application.getApplicationContext());
-    }
+    public void startTrackingForeground(Activity activity) {
+        try {
+            if (pixel == null) pixel = new Pixel(activity);
+        }
+        catch (Exception e) { }
 
+        if(deviceInfos == null) deviceInfos = new DeviceInfos(activity);
+
+        onActivityResumed(activity);
+
+        activity.getApplication().registerActivityLifecycleCallbacks(appLifecycleManager);
+        savePreference(ACTION_TRACK_FOREGROUND, "true", activity.getApplicationContext());
+    }
 
     /* Stop tracking */
     public void stopTrackingLocation(Context context) {
@@ -231,6 +277,31 @@ public class PredicIO {
     }
 
     /* Utils */
+    void onActivityResumed(final Activity activity) {
+        nbRunningActivities++;
+        if (nbRunningActivities == 1) {
+            FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(activity.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
+                @Override
+                public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
+                sendHttpForegroundRequest();
+                }
+            });
+            task.execute();
+        }
+    }
+
+    void onActivityStopped() {
+        if(nbRunningActivities > 0) {
+            nbRunningActivities = 0;
+            sendHttpBackgroundRequest();
+        }
+    }
+
+    void setLocationAccuracy(Context context, String accuracyMethod) {
+        locationAccuracyMethod = (accuracyMethod == null) ? LOCATION_FINE : accuracyMethod;
+        savePreference("io.predic.tracker.locationAccuracyMethod", locationAccuracyMethod, context);
+    }
+
     void setApiKey(Context context, String apiKey) {
         this.apiKey = apiKey;
         savePreference("io.predic.tracker.Apikey",this.apiKey,context);
@@ -249,12 +320,18 @@ public class PredicIO {
 
         JSONArray apps = new JSONArray();
 
-        for (ApplicationInfo packageInfo : packages) {
-            apps.put(pm.getApplicationLabel(packageInfo) + "");
+        for (ApplicationInfo applicationInfo : packages) {
+            if ((applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1) continue;
+            try {
+                JSONObject obj = new JSONObject();
+                obj.put("package", applicationInfo.packageName);
+                obj.put("name", pm.getApplicationLabel(applicationInfo));
+                obj.put("time",new File(applicationInfo.sourceDir).lastModified());
+                apps.put(obj);
+            } catch(Exception e) { }
         }
 
         JSONObject obj = new JSONObject();
-
         try {
             obj.put("apps", apps);
         } catch(JSONException e) {
@@ -266,40 +343,43 @@ public class PredicIO {
 
     void receiveLocation(Context context, Location location) {
         if (location != null) {
-            double _latitude, _longitude, _accuracy;
-            String _provider;
+            double _latitude, _longitude;
 
             _latitude = location.getLatitude();
             _longitude = location.getLongitude();
-            _accuracy = location.getAccuracy();
-            _provider = location.getProvider();
 
-            nbOccurrencesLocation = isSameLocation(_latitude, _longitude) ? nbOccurrencesLocation + 1 : 0;
+            boolean move = (getDistance(_latitude,_longitude,latitude,longitude) > (minMoveDistance/1000));
+            nbOccurrencesLocation = (move) ? 0 : nbOccurrencesLocation + 1;
+
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+            accuracy = location.getAccuracy();
+            provider = location.getProvider();
+            altitude = location.getAltitude();
+
+            String priority = locationAccuracyMethod;
 
             long newIntervalTracking;
-            if(nbOccurrencesLocation < 5)
+            if(nbOccurrencesLocation < 5) {
                 newIntervalTracking = 60000;
-            else if(nbOccurrencesLocation < 30)
-                newIntervalTracking = 3*60000;
-            else if(nbOccurrencesLocation < 60)
-                newIntervalTracking = 5*60000;
-            else
-                newIntervalTracking = 10*60000;
+                minMoveDistance = 10;
+            }
+            else if(nbOccurrencesLocation < 30) {
+                newIntervalTracking = 3 * 60000;
+                minMoveDistance = 100;
+                priority = LOCATION_COARSE;
+            }
+            else {
+                newIntervalTracking = 10 * 60000;
+                minMoveDistance = 200;
+                priority = LOCATION_COARSE;
+            }
 
             int intervalRequest = nbOccurrencesLocation < 15 ? 5 : 15;
 
-            if(newIntervalTracking != intervalTracking)
-            {
+            if(newIntervalTracking != intervalTracking) {
                 intervalTracking = newIntervalTracking;
-                improveTrackingLocation(context, intervalTracking);
-            }
-
-            latitude = _latitude;
-            longitude = _longitude;
-            accuracy = _accuracy;
-
-            if (provider != null) {
-                provider = _provider;
+                improveTrackingLocation(context, intervalTracking, priority);
             }
 
             if (nbOccurrencesLocation < 3 || nbOccurrencesLocation % intervalRequest == 0) {
@@ -327,13 +407,13 @@ public class PredicIO {
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
                 AAID = advertisingInfo.getId();
                 startService(context, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
-                improveTrackingLocation(context, 60000);
+                improveTrackingLocation(context, 60000, locationAccuracyMethod);
             }
         });
         task.execute();
     }
 
-    private void improveTrackingLocation(Context context, long interval) {
+    private void improveTrackingLocation(Context context, long interval, String priority) {
         int permissionCheck = ContextCompat.checkSelfPermission(context.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
 
@@ -344,7 +424,7 @@ public class PredicIO {
                 mLocationCallback = new LocationCallback() {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
-                        Log.d("PREDICIO", "Location updated");
+                    Log.d("PREDICIO", "Location updated");
                     }
                 };
             }
@@ -352,12 +432,12 @@ public class PredicIO {
                 mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
             }
 
-            Log.d("PREDICIO","Location interval: "+interval);
+            Log.d("PREDICIO","Location interval: "+interval + ", minMoveDistance: "+ minMoveDistance + ", Location method: " + priority);
 
             LocationRequest mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(interval);
             mLocationRequest.setFastestInterval(5000);
-            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            mLocationRequest.setPriority((priority.equals(LOCATION_FINE)) ? LocationRequest.PRIORITY_HIGH_ACCURACY : LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
 
@@ -367,8 +447,8 @@ public class PredicIO {
     private double getDistance(double lat1, double lng1, double lat2, double lng2) {
         double earthRadius = 6371; // in km, change to 3958.75 for miles output
 
-        double dLat = Math.toRadians(lat2-lat1);
-        double dLng = Math.toRadians(lng2-lng1);
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lng2 - lng1);
 
         double sindLat = Math.sin(dLat / 2);
         double sindLng = Math.sin(dLng / 2);
@@ -376,19 +456,15 @@ public class PredicIO {
         double a = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
                 * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
 
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         double dist = earthRadius * c;
 
         return dist; // output distance, in KM
     }
 
-    private boolean isSameLocation(double lat, double lon) {
-        return getDistance(lat, lon, latitude, longitude) < 0.01;
-    }
-
     private String getBaseUrl() {
-        return "https://" + getMD5(AAID).substring(0, 2) + ".trkr.predic.io";
+        return "https://" + getMD5(AAID).substring(0, 2) + ".trkr.predic.io/sdk/2.0";
     }
 
     private static String getMD5(String str) {
@@ -441,9 +517,7 @@ public class PredicIO {
         }
     }
 
-    /*
-       HTTP requests
-    */
+    /* HTTP requests */
     void sendHttpCheckOptinRequest(HttpRequestResponseCallback callback) {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
@@ -463,18 +537,42 @@ public class PredicIO {
     void sendHttpForegroundRequest() {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
-            String url = getBaseUrl() + "/open/" + apiKey + "/" + AAID;
+
+            String deviceParams = (deviceInfos != null) ? "?" + deviceInfos.getParams() : "";
+
+            String url = getBaseUrl() + "/open/" + apiKey + "/" + AAID + deviceParams;
+
+            try {
+                pixel.shoot(url);
+            }
+            catch(Exception e) {
+                HttpRequest.getInstance().sendHttpStringRequest(url, null);
+            }
+        }
+    }
+
+    void sendHttpBackgroundRequest() {
+        this.warningNoApiKey();
+        if (AAID != null && apiKey != null) {
+            String url = getBaseUrl() + "/close/" + apiKey + "/" + AAID;
             HttpRequest.getInstance().sendHttpStringRequest(url, null);
-            String url2 = "https://www.mobilesiteserver.com/display/?tag=jx6ako&cad[device_ifa]=" + AAID;
-            HttpRequest.getInstance().sendHttpStringRequest(url2, null);
         }
     }
 
     void sendHttpLocationRequest() {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null) {
-            String url = getBaseUrl() + "/location/" + apiKey + "/" + AAID +  "/" + latitude + "/" + longitude + "/" + accuracy + "/" + provider;
-            HttpRequest.getInstance().sendHttpStringRequest(url, null);
+
+            String deviceParams = (deviceInfos != null) ? "?" + deviceInfos.getParams() : "";
+
+            String url = getBaseUrl() + "/location/" + apiKey + "/" + AAID +  "/" + latitude + "/" + longitude + "/" + altitude + "/" + accuracy + "/" + provider + deviceParams;
+
+            try {
+                pixel.shoot(url);
+            }
+            catch(Exception e) {
+                HttpRequest.getInstance().sendHttpStringRequest(url, null);
+            }
         }
     }
 
@@ -493,5 +591,4 @@ public class PredicIO {
             HttpRequest.getInstance().sendHttpJSONRequest(url, obj);
         }
     }
-
 }

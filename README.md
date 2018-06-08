@@ -4,20 +4,23 @@
 The SDK works on all Android versions from `4.0.0` and above.
 
 It uses the following permissions:
-* ACCESS_FINE_LOCATION - Requested to access precise location.
+* ACCESS_FINE_LOCATION / ACCESS_COARSE_LOCATION - Requested to access location.
 * INTERNET - Requested to access Predicio services.
+* ACCESS_NETWORK_STATE - Requested to get carrier information
+* ACCESS_WIFI_STATE - Requested to get wifi information
 
 ## How does it work ?
 Our SDK is designed to run in the app background once installed on your app.
 
 When launching, the SDK checks the user consent then starts collecting data periodically.
 
-It only collects data you're sharing with us.In order to minimize battery and network usage, our SDK collects and sends data from once every twenty minutes to every minute if high location activity is noticed.
+It only collects data you're sharing with us.
+In order to minimize battery and network usage, our SDK collects and sends data from once every twenty minutes to every minute if high location activity is noticed.
 
 ## Install
 
 Add this code to your root `build.gradle`:
-```
+```gradle
 allprojects {
   repositories {
     ...
@@ -28,10 +31,10 @@ allprojects {
 ```
 
 Add this code to your app `build.gradle`:
-```
+```gradle
 dependencies {
   ...
-  compile 'com.github.team-predicio:android-sdk:master-SNAPSHOT'
+  compile 'com.github.team-predicio:android-sdk:1.9.9'
   ...
 }
 ```
@@ -90,8 +93,11 @@ PredicIO.getInstance().startTrackingApps(this);
 // start tracking user's locations
 PredicIO.getInstance().startTrackingLocation(this);
 
-// Track when user open set your application on foreground
-PredicIO.getInstance().startTrackingForeground(this.getApplication());
+//you can define the accuracy method by using PredicIO.LOCATION_FINE or PredicIO.LOCATION_COARSE, Fine location is used by default.
+PredicIO.getInstance().startTrackingLocation(this,PredicIO.LOCATION_COARSE);
+
+// Track when user opens your application on foreground
+PredicIO.getInstance().startTrackingForeground(this);
 ```
 
 You can stop collecting and sharing data at any moment using the following functions:
@@ -99,7 +105,7 @@ You can stop collecting and sharing data at any moment using the following funct
 PredicIO.getInstance().stopTrackingIdentity(this);
 PredicIO.getInstance().stopTrackingApps(this);
 PredicIO.getInstance().stopTrackingLocation(this);
-PredicIO.getInstance().stopTrackingForeground(this.getApplication());
+PredicIO.getInstance().stopTrackingForeground(this);
 ```
 
 ## Use-case
@@ -120,7 +126,7 @@ PredicIO.getInstance().checkOptIn(myContext, new HttpRequestResponseCallback() {
           PredicIO.getInstance().startTrackingIdentity(myContext);
           PredicIO.getInstance().startTrackingApps(myContext);
           PredicIO.getInstance().startTrackingLocation(myContext);
-          PredicIO.getInstance().startTrackingForeground(myContext.getApplication());
+          PredicIO.getInstance().startTrackingForeground(myContext);
         }
         @Override
         public void onError(VolleyError e) {}
@@ -130,7 +136,7 @@ PredicIO.getInstance().checkOptIn(myContext, new HttpRequestResponseCallback() {
       PredicIO.getInstance().startTrackingIdentity(myContext);
       PredicIO.getInstance().startTrackingApps(myContext);
       PredicIO.getInstance().startTrackingLocation(myContext);
-      PredicIO.getInstance().startTrackingForeground(myContext.getApplication());
+      PredicIO.getInstance().startTrackingForeground(myContext);
     }
   }
   @Override
