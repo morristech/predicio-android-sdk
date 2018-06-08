@@ -35,7 +35,7 @@ Add this code to your app `build.gradle`:
 ```gradle
 dependencies {
   ...
-  compile 'com.github.team-predicio:android-sdk:2.0.0'
+  compile 'com.github.team-predicio:android-sdk:2.0.3'
   ...
 }
 ```
