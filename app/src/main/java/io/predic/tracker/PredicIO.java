@@ -149,17 +149,9 @@ public class PredicIO {
     }
 
     public void setIdentity(Context context, String email) {
-        if (email != null) {
-            if(email.contains("@"))
-                identity = getMD5(email.toLowerCase());
-            else if(email.matches("^[0-9a-f]{32}$"))
-                identity = email;
-            else {
-                Log.e("PREDICIO","Unrecogized email identity");
-                identity = null;
-            }
-
-            if(identity != null) savePreference("io.predic.tracker.Identity", identity, context);
+        if (email != null && !email.contains("@")) {
+            identity = email;
+            savePreference("io.predic.tracker.Identity", email, context);
         }
     }
 
@@ -460,24 +452,7 @@ public class PredicIO {
     }
 
     private String getBaseUrl() {
-        return "https://" + getMD5(AAID).substring(0, 2) + ".trkr.predic.io/sdk/2.0";
-    }
-
-    private static String getMD5(String str) {
-        try {
-            byte[] idInBytes = str.getBytes("UTF-8");
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] idDigest = md.digest(idInBytes);
-            String md5 = new BigInteger(1, idDigest).toString(16);
-            while (md5.length() < 32) md5 = "0" + md5;
-            return md5;
-        } catch (UnsupportedEncodingException e) {
-            Log.e("PREDICIO", "MD5 algorithm is not supported.");
-            return null;
-        } catch (NoSuchAlgorithmException e) {
-            Log.e("PREDICIO", "MD5 algorithm does not exist.");
-            return null;
-        }
+        return "https://" + StringEncryption.getMD5(AAID).substring(0, 2) + ".trkr.predic.io/sdk/2.0";
     }
 
     private void startService(Context context, String action, int interval) {
@@ -575,7 +550,7 @@ public class PredicIO {
     void sendHttpIdentityRequest() {
         this.warningNoApiKey();
         if (AAID != null && apiKey != null && identity != null) {
-            String url = getBaseUrl() + "/identity/" + apiKey + "/" + AAID + "/" + identity;
+            String url = getBaseUrl() + "/identity/" + apiKey + "/" + AAID + "/" + StringEncryption.getMD5(identity) + "/" + StringEncryption.getSHA1(identity) + "/" + StringEncryption.getSHA256(identity);
             HttpRequest.getInstance().sendHttpStringRequest(url, null);
         }
     }
