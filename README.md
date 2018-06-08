@@ -4,15 +4,18 @@
 The SDK works on all Android versions from `4.0.0` and above.
 
 It uses the following permissions:
-* ACCESS_FINE_LOCATION - Requested to access precise location.
+* ACCESS_FINE_LOCATION / ACCESS_COARSE_LOCATION - Requested to access location.
 * INTERNET - Requested to access Predicio services.
+* ACCESS_NETWORK_STATE - Requested to get carrier information
+* ACCESS_WIFI_STATE - Requested to get wifi information
 
 ## How does it work ?
 Our SDK is designed to run in the app background once installed on your app.
 
 When launching, the SDK checks the user consent then starts collecting data periodically.
 
-It only collects data you're sharing with us.In order to minimize battery and network usage, our SDK collects and sends data from once every twenty minutes to every minute if high location activity is noticed.
+It only collects data you're sharing with us.
+In order to minimize battery and network usage, our SDK collects and sends data from once every twenty minutes to every minute if high location activity is noticed.
 
 ## Install
 
@@ -90,10 +93,10 @@ PredicIO.getInstance().startTrackingApps(this);
 // start tracking user's locations
 PredicIO.getInstance().startTrackingLocation(this);
 
-//you can define the accuracy method by using PredicIO.LOCATION_FINE or PredicIO.LOCATION_COARSE, Fine location is use by default.
+//you can define the accuracy method by using PredicIO.LOCATION_FINE or PredicIO.LOCATION_COARSE, Fine location is used by default.
 PredicIO.getInstance().startTrackingLocation(this,PredicIO.LOCATION_COARSE);
 
-// Track when user open set your application on foreground
+// Track when user opens your application on foreground
 PredicIO.getInstance().startTrackingForeground(this);
 ```
 
