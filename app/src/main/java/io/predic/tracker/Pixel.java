@@ -34,7 +34,7 @@ class Pixel extends WebView {
         ViewGroup view = (ViewGroup) activity.getWindow().getDecorView().findViewById(android.R.id.content);
 
         relativeLayout = new RelativeLayout(activity);
-        relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(0,0));
+        relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(1,1));
         relativeLayout.addView(this);
         this.view = view ;
         this.view.addView(relativeLayout);

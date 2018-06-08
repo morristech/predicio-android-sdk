@@ -76,13 +76,19 @@ public class PredicIO {
     private Pixel pixel;
     private int nbRunningActivities = 0;
     private DeviceInfos deviceInfos;
+    private boolean webviewState;
 
     public static PredicIO getInstance() {
         return ourInstance;
     }
 
     public static void initialize(Context context, String apiKey) {
+        initialize(context,apiKey,true);
+    }
+
+    public static void initialize(Context context, String apiKey, boolean webviewState) {
         ourInstance.setApiKey(context,apiKey);
+        ourInstance.setWebView(webviewState);
         HttpRequest.initialize(context.getApplicationContext());
     }
 
@@ -165,7 +171,7 @@ public class PredicIO {
     public void startTrackingLocation(final Activity activity, String accuracyMethod) {
 
         try {
-            if (pixel == null) pixel = new Pixel(activity);
+            if (webviewState == true && pixel == null) pixel = new Pixel(activity);
         }
         catch (Exception e) { }
 
@@ -231,7 +237,7 @@ public class PredicIO {
 
     public void startTrackingForeground(Activity activity) {
         try {
-            if (pixel == null) pixel = new Pixel(activity);
+            if (webviewState == true && pixel == null) pixel = new Pixel(activity);
         }
         catch (Exception e) { }
 
@@ -293,6 +299,10 @@ public class PredicIO {
     void setApiKey(Context context, String apiKey) {
         this.apiKey = apiKey;
         savePreference("io.predic.tracker.Apikey",this.apiKey,context);
+    }
+
+    void setWebView(boolean webviewState){
+        this.webviewState = webviewState;
     }
 
     JSONObject getJSONObjectApps(Context context) {
