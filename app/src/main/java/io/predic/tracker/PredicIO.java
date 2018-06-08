@@ -145,7 +145,7 @@ public class PredicIO {
     }
 
     public void setIdentity(Context context, String email) {
-        if (email != null && !email.contains("@")) {
+        if (email != null && email.contains("@")) {
             identity = email;
             savePreference("io.predic.tracker.Identity", email, context);
         }
