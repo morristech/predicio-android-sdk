@@ -31,7 +31,7 @@ Add this code to your app `build.gradle`:
 ```gradle
 dependencies {
   ...
-  compile 'com.github.team-predicio:android-sdk:master-SNAPSHOT'
+  compile 'com.github.team-predicio:android-sdk:1.9.9'
   ...
 }
 ```
