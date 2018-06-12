@@ -235,18 +235,16 @@ public class PredicIO {
         }
     }
 
-    public void startTrackingForeground(Activity activity) {
+    public void startTrackingForeground(Application app) {
         try {
-            if (webviewState == true && pixel == null) pixel = new Pixel(activity);
+            if (webviewState == true && pixel == null) pixel = new Pixel(app);
         }
         catch (Exception e) { }
 
-        if(deviceInfos == null) deviceInfos = new DeviceInfos(activity);
+        if(deviceInfos == null) deviceInfos = new DeviceInfos(app);
 
-        onActivityResumed(activity);
-
-        activity.getApplication().registerActivityLifecycleCallbacks(appLifecycleManager);
-        savePreference(ACTION_TRACK_FOREGROUND, "true", activity.getApplicationContext());
+        app.registerActivityLifecycleCallbacks(appLifecycleManager);
+        savePreference(ACTION_TRACK_FOREGROUND, "true", app);
     }
 
     /* Stop tracking */

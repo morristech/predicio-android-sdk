@@ -1,6 +1,6 @@
 package io.predic.tracker;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 import android.webkit.WebChromeClient;
@@ -17,8 +17,8 @@ class Pixel extends WebView {
         }
     };
 
-    public Pixel(Activity activity){
-        super(activity);
+    public Pixel(Context context){
+        super(context);
         setWebChromeClient(new WebChromeClient());
         setWebViewClient(new WebViewClient());
         setWillNotDraw(true);
