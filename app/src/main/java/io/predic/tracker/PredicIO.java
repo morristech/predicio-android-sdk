@@ -83,12 +83,14 @@ public class PredicIO {
     }
 
     public static void initialize(Context context, String apiKey, boolean webviewState) {
+        if(context == null) return;
         ourInstance.setApiKey(context,apiKey);
         ourInstance.setWebView(webviewState);
         HttpRequest.initialize(context.getApplicationContext());
     }
 
     public void checkOptIn(Context context, final HttpRequestResponseCallback callback) {
+        if(context == null) return;
         FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
@@ -100,6 +102,7 @@ public class PredicIO {
     }
 
     public void setOptIn(Context context, final HttpRequestResponseCallback callback) {
+        if(context == null) return;
         FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
@@ -111,7 +114,7 @@ public class PredicIO {
     }
 
     public void showOptIn(final String title, final String message, final Activity activity, final HttpRequestResponseCallback callback) {
-
+        if(activity == null) return;
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(activity, android.R.style.Theme_Material_Dialog_Alert);
@@ -145,6 +148,7 @@ public class PredicIO {
     }
 
     public void setIdentity(Context context, String email) {
+        if(context == null) return;
         if (email != null && email.contains("@")) {
             identity = email;
             savePreference("io.predic.tracker.Identity", email, context);
@@ -153,11 +157,12 @@ public class PredicIO {
 
     /* Start tracking */
     public void startTrackingLocation(final Activity activity) {
+        if(activity == null) return;
         this.startTrackingLocation(activity, LOCATION_FINE);
     }
 
     public void startTrackingLocation(final Activity activity, String accuracyMethod) {
-
+        if(activity == null) return;
         try {
             if (webviewState == true && pixel == null) pixel = new Pixel(activity);
         }
@@ -196,6 +201,7 @@ public class PredicIO {
     }
 
     public void startTrackingApps(final Context context) {
+        if(context == null) return;
         FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
@@ -207,7 +213,7 @@ public class PredicIO {
     }
 
     public void startTrackingIdentity(final Context context) {
-
+        if(context == null) return;
         if(identity != null) {
             FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
                 @Override
@@ -224,6 +230,7 @@ public class PredicIO {
     }
 
     public void startTrackingForeground(Activity activity) {
+        if(activity == null) return;
         try {
             if (webviewState == true && pixel == null) pixel = new Pixel(activity);
         }
@@ -239,6 +246,7 @@ public class PredicIO {
 
     /* Stop tracking */
     public void stopTrackingLocation(Context context) {
+        if(context == null) return;
         if (mFusedLocationClient != null && mLocationCallback != null) {
             mFusedLocationClient.removeLocationUpdates(mLocationCallback);
         }
@@ -246,6 +254,7 @@ public class PredicIO {
     }
 
     public void stopTrackingIdentity(Context context) {
+        if(context == null) return;
         stopService(context, ACTION_TRACK_IDENTITY);
     }
 
@@ -254,6 +263,7 @@ public class PredicIO {
     }
 
     public void stopTrackingForeground(Application application) {
+        if(application == null) return;
         application.unregisterActivityLifecycleCallbacks(appLifecycleManager);
         savePreference(ACTION_TRACK_FOREGROUND, "false", application.getApplicationContext());
     }
