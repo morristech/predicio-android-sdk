@@ -17,7 +17,7 @@ class ApplicationLifecycleManager implements Application.ActivityLifecycleCallba
 
     @Override
     public void onActivityResumed(Activity activity) {
-        PredicIO.getInstance().onActivityResumed(activity);
+        PredicIO.getInstance().onActivityResumed();
     }
 
     @Override
