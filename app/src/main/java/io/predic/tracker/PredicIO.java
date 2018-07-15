@@ -168,6 +168,7 @@ public class PredicIO {
 
     public void startTrackingLocation(final Activity activity, String accuracyMethod) {
 
+        Log.d("predicio","locatin" + activity.toString());
         try {
             if (activity != null && webviewState == true && pixel == null) pixel = new Pixel(activity);
         }
@@ -180,24 +181,25 @@ public class PredicIO {
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            if(activity == null) return;
-            ActivityCompat.requestPermissions(
-                    activity,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-                    1
-            );
-            //startCheckingPermissionTask
-            Timer timer = new Timer();
-            timer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-                    if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                        this.cancel();
-                        startLocationServices();
+            if(activity != null) {
+                ActivityCompat.requestPermissions(
+                        activity,
+                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                        1
+                );
+                //startCheckingPermissionTask
+                Timer timer = new Timer();
+                timer.scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+                        int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+                        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                            this.cancel();
+                            startLocationServices();
+                        }
                     }
-                }
-            }, 5 * 1000, 5 * 1000);
+                }, 5 * 1000, 5 * 1000);
+            }
         }
         else {
             startLocationServices();
