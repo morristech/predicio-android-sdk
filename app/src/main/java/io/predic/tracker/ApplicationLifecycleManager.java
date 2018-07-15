@@ -5,7 +5,6 @@ import android.app.Application;
 import android.os.Bundle;
 
 class ApplicationLifecycleManager implements Application.ActivityLifecycleCallbacks {
-    private int nbRunningActivities = 0;
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {

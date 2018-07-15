@@ -388,6 +388,7 @@ public class PredicIO {
 
     void updateAAID() {
         if (AAID == null) {
+            Log.d("Predicio",context.toString());
             FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
                 @Override
                 public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
