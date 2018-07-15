@@ -59,6 +59,7 @@ public class PredicIO {
     private FusedLocationProviderClient mFusedLocationClient = null;
     private static int nbOccurrencesLocation = 0;
     private static long intervalTracking = 60000;
+    private Context context = null;
     private String apiKey;
     private String AAID;
     private double latitude;
@@ -83,15 +84,21 @@ public class PredicIO {
     }
 
     public static void initialize(Context context, String apiKey, boolean webviewState) {
-        if(context == null) return;
-        ourInstance.setApiKey(context,apiKey);
+
+        if(context == null)
+        {
+            Log.e("PREDICIO","Initialized failed, context is null");
+            return;
+        }
+
+        ourInstance.setContext(context.getApplicationContext());
+        ourInstance.setApiKey(apiKey);
         ourInstance.setWebView(webviewState);
         HttpRequest.initialize(context.getApplicationContext());
     }
 
-    public void checkOptIn(Context context, final HttpRequestResponseCallback callback) {
-        if(context == null) return;
-        FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
+    public void checkOptIn(final HttpRequestResponseCallback callback) {
+        FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
                 AAID = advertisingInfo.getId();
@@ -101,9 +108,8 @@ public class PredicIO {
         task.execute();
     }
 
-    public void setOptIn(Context context, final HttpRequestResponseCallback callback) {
-        if(context == null) return;
-        FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
+    public void setOptIn(final HttpRequestResponseCallback callback) {
+        FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
                 AAID = advertisingInfo.getId();
@@ -115,6 +121,7 @@ public class PredicIO {
 
     public void showOptIn(final String title, final String message, final Activity activity, final HttpRequestResponseCallback callback) {
         if(activity == null) return;
+
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(activity, android.R.style.Theme_Material_Dialog_Alert);
@@ -122,7 +129,7 @@ public class PredicIO {
             builder = new AlertDialog.Builder(activity);
         }
 
-        final TextView messageView = new TextView(activity.getApplicationContext());
+        final TextView messageView = new TextView(context);
         final SpannableString s = new SpannableString(message);
 
         Linkify.addLinks(s, Linkify.WEB_URLS);
@@ -147,36 +154,33 @@ public class PredicIO {
             .show();
     }
 
-    public void setIdentity(Context context, String email) {
-        if(context == null) return;
+    public void setIdentity(String email) {
         if (email != null && email.contains("@")) {
             identity = email;
-            savePreference("io.predic.tracker.Identity", email, context);
+            savePreference("io.predic.tracker.Identity", email);
         }
     }
 
     /* Start tracking */
     public void startTrackingLocation(final Activity activity) {
-        if(activity == null) return;
         this.startTrackingLocation(activity, LOCATION_FINE);
     }
 
     public void startTrackingLocation(final Activity activity, String accuracyMethod) {
-        if(activity == null) return;
+
         try {
-            if (webviewState == true && pixel == null) pixel = new Pixel(activity);
+            if (activity != null && webviewState == true && pixel == null) pixel = new Pixel(activity);
         }
         catch (Exception e) { }
 
-        if(deviceInfos == null) deviceInfos = new DeviceInfos(activity);
+        if(deviceInfos == null) deviceInfos = new DeviceInfos(context);
 
-        final Context context = activity.getApplicationContext();
-
-        setLocationAccuracy(context,accuracyMethod);
+        setLocationAccuracy(accuracyMethod);
 
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            if(activity == null) return;
             ActivityCompat.requestPermissions(
                     activity,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
@@ -190,36 +194,34 @@ public class PredicIO {
                     int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
                     if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
                         this.cancel();
-                        startLocationServices(activity);
+                        startLocationServices();
                     }
                 }
             }, 5 * 1000, 5 * 1000);
         }
         else {
-            startLocationServices(activity);
+            startLocationServices();
         }
     }
 
-    public void startTrackingApps(final Context context) {
-        if(context == null) return;
-        FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
+    public void startTrackingApps() {
+        FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
             AAID = advertisingInfo.getId();
-            startService(context, ACTION_TRACK_APPS, INTERVAL_TRACKING_APPS);
+            startService(ACTION_TRACK_APPS, INTERVAL_TRACKING_APPS);
             }
         });
         task.execute();
     }
 
-    public void startTrackingIdentity(final Context context) {
-        if(context == null) return;
+    public void startTrackingIdentity() {
         if(identity != null) {
-            FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
+            FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
                 @Override
                 public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
                     AAID = advertisingInfo.getId();
-                    startService(context, ACTION_TRACK_IDENTITY, INTERVAL_TRACKING_IDENTITY);
+                    startService(ACTION_TRACK_IDENTITY, INTERVAL_TRACKING_IDENTITY);
                 }
             });
             task.execute();
@@ -230,49 +232,47 @@ public class PredicIO {
     }
 
     public void startTrackingForeground(Activity activity) {
-        if(activity == null) return;
+
         try {
-            if (webviewState == true && pixel == null) pixel = new Pixel(activity);
+            if (activity != null && webviewState == true && pixel == null) pixel = new Pixel(activity);
         }
         catch (Exception e) { }
 
-        if(deviceInfos == null) deviceInfos = new DeviceInfos(activity);
+        if(deviceInfos == null) deviceInfos = new DeviceInfos(context);
 
-        onActivityResumed(activity);
+        onActivityResumed();
 
-        activity.getApplication().registerActivityLifecycleCallbacks(appLifecycleManager);
-        savePreference(ACTION_TRACK_FOREGROUND, "true", activity.getApplicationContext());
+        if(activity != null) activity.getApplication().registerActivityLifecycleCallbacks(appLifecycleManager);
+        savePreference(ACTION_TRACK_FOREGROUND, "true");
     }
 
     /* Stop tracking */
-    public void stopTrackingLocation(Context context) {
-        if(context == null) return;
+    public void stopTrackingLocation() {
         if (mFusedLocationClient != null && mLocationCallback != null) {
             mFusedLocationClient.removeLocationUpdates(mLocationCallback);
         }
-        stopService(context,ACTION_TRACK_LOCATION);
+        stopService(ACTION_TRACK_LOCATION);
     }
 
-    public void stopTrackingIdentity(Context context) {
-        if(context == null) return;
-        stopService(context, ACTION_TRACK_IDENTITY);
+    public void stopTrackingIdentity() {
+        stopService(ACTION_TRACK_IDENTITY);
     }
 
-    public void stopTrackingApps(Context context) {
-        stopService(context,ACTION_TRACK_APPS);
+    public void stopTrackingApps() {
+        stopService(ACTION_TRACK_APPS);
     }
 
     public void stopTrackingForeground(Application application) {
         if(application == null) return;
         application.unregisterActivityLifecycleCallbacks(appLifecycleManager);
-        savePreference(ACTION_TRACK_FOREGROUND, "false", application.getApplicationContext());
+        savePreference(ACTION_TRACK_FOREGROUND, "false");
     }
 
     /* Utils */
-    void onActivityResumed(final Activity activity) {
+    void onActivityResumed() {
         nbRunningActivities++;
         if (nbRunningActivities == 1) {
-            FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(activity.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
+            FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
                 @Override
                 public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
                 sendHttpForegroundRequest();
@@ -289,22 +289,26 @@ public class PredicIO {
         }
     }
 
-    void setLocationAccuracy(Context context, String accuracyMethod) {
+    void setLocationAccuracy(String accuracyMethod) {
         locationAccuracyMethod = (accuracyMethod == null) ? LOCATION_FINE : accuracyMethod;
-        savePreference("io.predic.tracker.locationAccuracyMethod", locationAccuracyMethod, context);
+        savePreference("io.predic.tracker.locationAccuracyMethod", locationAccuracyMethod);
     }
 
-    void setApiKey(Context context, String apiKey) {
+    void setContext(Context context) {
+        this.context = context;
+    }
+
+    void setApiKey(String apiKey) {
         this.apiKey = apiKey;
-        savePreference("io.predic.tracker.Apikey",this.apiKey,context);
+        savePreference("io.predic.tracker.Apikey",this.apiKey);
     }
 
     void setWebView(boolean webviewState){
         this.webviewState = webviewState;
     }
 
-    JSONObject getJSONObjectApps(Context context) {
-        final PackageManager pm = context.getApplicationContext().getPackageManager();
+    JSONObject getJSONObjectApps() {
+        final PackageManager pm = context.getPackageManager();
 
         List<ApplicationInfo> packages;
         try {
@@ -335,7 +339,7 @@ public class PredicIO {
         return obj;
     }
 
-    void receiveLocation(Context context, Location location) {
+    void receiveLocation(Location location) {
         if (location != null) {
             double _latitude, _longitude;
 
@@ -373,7 +377,7 @@ public class PredicIO {
 
             if(newIntervalTracking != intervalTracking) {
                 intervalTracking = newIntervalTracking;
-                improveTrackingLocation(context, intervalTracking, priority);
+                improveTrackingLocation(intervalTracking, priority);
             }
 
             if (nbOccurrencesLocation < 3 || nbOccurrencesLocation % intervalRequest == 0) {
@@ -382,9 +386,9 @@ public class PredicIO {
         }
     }
 
-    void updateAAID(final Context context) {
+    void updateAAID() {
         if (AAID == null) {
-            FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
+            FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
                 @Override
                 public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
                     AAID = advertisingInfo.getId();
@@ -395,20 +399,20 @@ public class PredicIO {
         }
     }
 
-    void startLocationServices(final Context context) {
-        FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context.getApplicationContext(), new FetchAdvertisingInfoTaskCallback() {
+    void startLocationServices() {
+        FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
                 AAID = advertisingInfo.getId();
-                startService(context, ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
-                improveTrackingLocation(context, 60000, locationAccuracyMethod);
+                startService(ACTION_TRACK_LOCATION, INTERVAL_TRACKING_LOCATION);
+                improveTrackingLocation(60000, locationAccuracyMethod);
             }
         });
         task.execute();
     }
 
-    private void improveTrackingLocation(Context context, long interval, String priority) {
-        int permissionCheck = ContextCompat.checkSelfPermission(context.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+    private void improveTrackingLocation(long interval, String priority) {
+        int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
 
             if (mFusedLocationClient != null && mLocationCallback != null) {
@@ -461,28 +465,26 @@ public class PredicIO {
         return "https://" + StringEncryption.getMD5(AAID).substring(0, 2) + ".trkr.predic.io/sdk/2.0";
     }
 
-    private void startService(Context context, String action, int interval) {
-        Context appContext = context.getApplicationContext();
-        Intent localIntent = new Intent(appContext, PredicIOReceiver.class);
+    private void startService(String action, int interval) {
+        Intent localIntent = new Intent(context, PredicIOReceiver.class);
         localIntent.setAction(action);
-        PendingIntent pi = PendingIntent.getBroadcast(appContext, 0, localIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager am = (AlarmManager) appContext.getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, localIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, pi);
-        savePreference(action, "true", appContext);
+        savePreference(action, "true");
     }
 
-    private void stopService(Context context, String action) {
-        Context appContext = context.getApplicationContext();
-        Intent localIntent = new Intent(appContext, PredicIOReceiver.class);
+    private void stopService(String action) {
+        Intent localIntent = new Intent(context, PredicIOReceiver.class);
         localIntent.setAction(action);
-        PendingIntent pi = PendingIntent.getBroadcast(appContext, 0, localIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager am = (AlarmManager) appContext.getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, localIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
-        savePreference(action, "false", context);
+        savePreference(action, "false");
     }
 
-    private void savePreference(String key, String value, Context context) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+    private void savePreference(String key, String value) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(key, value);
         editor.commit();

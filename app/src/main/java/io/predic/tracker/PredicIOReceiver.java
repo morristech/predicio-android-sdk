@@ -22,23 +22,21 @@ public class PredicIOReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, Intent intent) {
 
         Log.d("PREDICIO", "PredicIOReceiver.onReceive: " + intent.getAction());
-        PredicIO.getInstance().updateAAID(context);
+        PredicIO.getInstance().setContext(context);
+        PredicIO.getInstance().updateAAID();
         HttpRequest.initialize(context);
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         String apiKey = settings.getString("io.predic.tracker.Apikey", null);
         String identity = settings.getString("io.predic.tracker.Identity", null);
         String locationMethod = settings.getString("io.predic.tracker.locationAccuracyMethod", null);
-        PredicIO.getInstance().setApiKey(context, apiKey);
-        PredicIO.getInstance().setIdentity(context, identity);
-        PredicIO.getInstance().setLocationAccuracy(context, locationMethod);
+
+        PredicIO.getInstance().setApiKey(apiKey);
+        PredicIO.getInstance().setIdentity(identity);
+        PredicIO.getInstance().setLocationAccuracy(locationMethod);
 
         if (intent.getAction().equals(PredicIO.ACTION_TRACK_APPS)) {
-            JSONObject obj = PredicIO.getInstance().getJSONObjectApps(context);
-            if (obj != null) PredicIO.getInstance().sendHttpAppsRequest(obj);
-        }
-        else if (intent.getAction().equals(PredicIO.ACTION_TRACK_APPS)) {
-            JSONObject obj = PredicIO.getInstance().getJSONObjectApps(context);
+            JSONObject obj = PredicIO.getInstance().getJSONObjectApps();
             if (obj != null) PredicIO.getInstance().sendHttpAppsRequest(obj);
         }
         else if (intent.getAction().equals(PredicIO.ACTION_TRACK_IDENTITY)) {
@@ -53,7 +51,7 @@ public class PredicIOReceiver extends BroadcastReceiver {
                         public void onSuccess(Location location) {
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
-                                PredicIO.getInstance().receiveLocation(context,location);
+                                PredicIO.getInstance().receiveLocation(location);
                             }
                         }
                     });
@@ -72,15 +70,15 @@ public class PredicIOReceiver extends BroadcastReceiver {
             Log.d("PREDICIO", "Identity=" + trackingIdentity);
 
             if (trackingApps != null && trackingApps.equals("true")) {
-                PredicIO.getInstance().startTrackingApps(context);
+                PredicIO.getInstance().startTrackingApps();
             }
 
             if (trackingIdentity != null && trackingIdentity.equals("true")) {
-                PredicIO.getInstance().startTrackingIdentity(context);
+                PredicIO.getInstance().startTrackingIdentity();
             }
 
             if (trackingLocation != null && trackingLocation.equals("true")) {
-                PredicIO.getInstance().startLocationServices(context);
+                PredicIO.getInstance().startLocationServices();
             }
         }
     }
