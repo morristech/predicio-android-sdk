@@ -168,7 +168,6 @@ public class PredicIO {
 
     public void startTrackingLocation(final Activity activity, String accuracyMethod) {
 
-        Log.d("predicio","locatin" + activity.toString());
         try {
             if (activity != null && webviewState == true && pixel == null) pixel = new Pixel(activity);
         }
@@ -390,7 +389,6 @@ public class PredicIO {
 
     void updateAAID() {
         if (AAID == null) {
-            Log.d("Predicio",context.toString());
             FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
                 @Override
                 public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
