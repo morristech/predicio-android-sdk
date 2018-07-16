@@ -98,6 +98,7 @@ public class PredicIO {
     }
 
     public void checkOptIn(final HttpRequestResponseCallback callback) {
+        if(context == null) return;
         FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
@@ -109,6 +110,7 @@ public class PredicIO {
     }
 
     public void setOptIn(final HttpRequestResponseCallback callback) {
+        if(context == null) return;
         FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
@@ -120,8 +122,7 @@ public class PredicIO {
     }
 
     public void showOptIn(final String title, final String message, final Activity activity, final HttpRequestResponseCallback callback) {
-        if(activity == null) return;
-
+        if(context == null || activity == null) return;
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(activity, android.R.style.Theme_Material_Dialog_Alert);
@@ -155,6 +156,7 @@ public class PredicIO {
     }
 
     public void setIdentity(String email) {
+        if(context == null) return;
         if (email != null && email.contains("@")) {
             identity = email;
             savePreference("io.predic.tracker.Identity", email);
@@ -167,7 +169,7 @@ public class PredicIO {
     }
 
     public void startTrackingLocation(final Activity activity, String accuracyMethod) {
-
+        if(context == null) return;
         try {
             if (activity != null && webviewState == true && pixel == null) pixel = new Pixel(activity);
         }
@@ -206,6 +208,7 @@ public class PredicIO {
     }
 
     public void startTrackingApps() {
+        if(context == null) return;
         FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
@@ -217,6 +220,7 @@ public class PredicIO {
     }
 
     public void startTrackingIdentity() {
+        if(context == null) return;
         if(identity != null) {
             FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
                 @Override
@@ -233,7 +237,7 @@ public class PredicIO {
     }
 
     public void startTrackingForeground(Activity activity) {
-
+        if(context == null) return;
         try {
             if (activity != null && webviewState == true && pixel == null) pixel = new Pixel(activity);
         }
@@ -249,6 +253,7 @@ public class PredicIO {
 
     /* Stop tracking */
     public void stopTrackingLocation() {
+        if(context == null) return;
         if (mFusedLocationClient != null && mLocationCallback != null) {
             mFusedLocationClient.removeLocationUpdates(mLocationCallback);
         }
@@ -256,15 +261,17 @@ public class PredicIO {
     }
 
     public void stopTrackingIdentity() {
+        if(context == null) return;
         stopService(ACTION_TRACK_IDENTITY);
     }
 
     public void stopTrackingApps() {
+        if(context == null) return;
         stopService(ACTION_TRACK_APPS);
     }
 
     public void stopTrackingForeground(Application application) {
-        if(application == null) return;
+        if(context == null) return;
         application.unregisterActivityLifecycleCallbacks(appLifecycleManager);
         savePreference(ACTION_TRACK_FOREGROUND, "false");
     }
