@@ -140,19 +140,19 @@ public class PredicIO {
         messageView.setTextColor(0xAAFFFFFF);
 
         builder.setTitle(title)
-            .setView(messageView)
-            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    if(callback != null) callback.onStringResponseSuccess(null);
-                }
-            })
-            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
+                .setView(messageView)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(callback != null) callback.onStringResponseSuccess(null);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
                         // do nothing
-                }
-            })
-            .setIcon(android.R.drawable.ic_dialog_alert)
-            .show();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 
     public void setIdentity(String email) {
@@ -212,8 +212,8 @@ public class PredicIO {
         FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
             @Override
             public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
-            AAID = advertisingInfo.getId();
-            startService(ACTION_TRACK_APPS, INTERVAL_TRACKING_APPS);
+                AAID = advertisingInfo.getId();
+                startService(ACTION_TRACK_APPS, INTERVAL_TRACKING_APPS);
             }
         });
         task.execute();
@@ -283,7 +283,7 @@ public class PredicIO {
             FetchAdvertisingInfoTask task = new FetchAdvertisingInfoTask(context, new FetchAdvertisingInfoTaskCallback() {
                 @Override
                 public void onAdvertisingInfoTaskExecute(AdvertisingIdClient.Info advertisingInfo) {
-                sendHttpForegroundRequest();
+                    sendHttpForegroundRequest();
                 }
             });
             task.execute();
@@ -430,7 +430,7 @@ public class PredicIO {
                 mLocationCallback = new LocationCallback() {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
-                    Log.d("PREDICIO", "Location updated");
+                        Log.d("PREDICIO", "Location updated");
                     }
                 };
             }

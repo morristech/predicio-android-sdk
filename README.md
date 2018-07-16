@@ -17,7 +17,6 @@ When launching, the SDK checks the user consent then starts collecting data peri
 It only collects data you're sharing with us.
 In order to minimize battery and network usage, our SDK collects and sends data from once every twenty minutes to every minute if high location activity is noticed.
 
-The SDK is also using a webview pixel (1x1) that we use to share data in real time with our partners. You can disable this feature inside the function initialize.
 ## Install
 
 Add this code to your root `build.gradle`:
@@ -35,7 +34,7 @@ Add this code to your app `build.gradle`:
 ```gradle
 dependencies {
   ...
-  compile 'com.github.team-predicio:android-sdk:2.1.0'
+  compile 'com.github.team-predicio:android-sdk:2.1.3'
   ...
 }
 ```
@@ -49,11 +48,6 @@ Then, synchronise your project.
 Initialize the SDK with your `API_KEY` inside an `Activity`.
 ```
 PredicIO.initialize(context, "API_KEY");
-```
-
-To disable the webview fonctionality use :
-```
-PredicIO.initialize(context, "API_KEY", false);
 ```
 
 ### User Consent
