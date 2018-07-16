@@ -35,7 +35,7 @@ Add this code to your app `build.gradle`:
 ```gradle
 dependencies {
   ...
-  compile 'com.github.team-predicio:android-sdk:2.0.3'
+  compile 'com.github.team-predicio:android-sdk:2.1.0'
   ...
 }
 ```
@@ -48,12 +48,12 @@ Then, synchronise your project.
 
 Initialize the SDK with your `API_KEY` inside an `Activity`.
 ```
-PredicIO.initialize(this, "API_KEY");
+PredicIO.initialize(context, "API_KEY");
 ```
 
 To disable the webview fonctionality use :
 ```
-PredicIO.initialize(this, "API_KEY", false);
+PredicIO.initialize(context, "API_KEY", false);
 ```
 
 ### User Consent
@@ -63,20 +63,20 @@ Predicio SDK gives you access to 3 different functions to manage consent easily:
 `checkOptIn` will check user consent regarding Predicio services:
 ```
 // PredicIO server will send "OK" if registered. "KO" if not registered.
-PredicIO.getInstance().checkOptIn(this, null);
+PredicIO.getInstance().checkOptIn(callback);
 ```
 
 `showOptIn` will display a customizable pop-up including `title` and `message` to request user opt-in.
 ```
-PredicIO.getInstance().showOptIn(title, message, this, null);
+PredicIO.getInstance().showOptIn(title, message, activity, callback);
 ```
 
 `setOptIn` will save user consent regarding Predicio services. Users will be considered as opted-in.
 ```
-PredicIO.getInstance().setOptIn(this, null);
+PredicIO.getInstance().setOptIn(callback);
 ```
 
-To get the`checkOptIn` and `showOptIn` functions results, please use:
+To get the`checkOptIn` and `showOptIn` functions results, please use callback:
 ```
 public interface HttpRequestResponseCallback {
   void onStringResponseSuccess(String response);
@@ -88,61 +88,61 @@ public interface HttpRequestResponseCallback {
 After validating user consent, use the following functions to start collecting data:
 ```
 //initialize user identity - pass user's email, we format this data with MD5
-PredicIO.getInstance().setIdentity(this, "your_user_email");
+PredicIO.getInstance().setIdentity("your_user_email");
 
 // start tracking the initialized identity
-PredicIO.getInstance().startTrackingIdentity(this);
+PredicIO.getInstance().startTrackingIdentity();
 
 // start tracking user's applications installed on the device
-PredicIO.getInstance().startTrackingApps(this);
+PredicIO.getInstance().startTrackingApps();
 
 // start tracking user's locations
-PredicIO.getInstance().startTrackingLocation(this);
+PredicIO.getInstance().startTrackingLocation(activity);
 
 //you can define the accuracy method by using PredicIO.LOCATION_FINE or PredicIO.LOCATION_COARSE, Fine location is used by default.
-PredicIO.getInstance().startTrackingLocation(this,PredicIO.LOCATION_COARSE);
+PredicIO.getInstance().startTrackingLocation(activity,PredicIO.LOCATION_COARSE);
 
 // Track when user opens your application on foreground
-PredicIO.getInstance().startTrackingForeground(this);
+PredicIO.getInstance().startTrackingForeground(activity);
 ```
 
 You can stop collecting and sharing data at any moment using the following functions:
 ```
-PredicIO.getInstance().stopTrackingIdentity(this);
-PredicIO.getInstance().stopTrackingApps(this);
-PredicIO.getInstance().stopTrackingLocation(this);
-PredicIO.getInstance().stopTrackingForeground(this);
+PredicIO.getInstance().stopTrackingIdentity();
+PredicIO.getInstance().stopTrackingApps();
+PredicIO.getInstance().stopTrackingLocation();
+PredicIO.getInstance().stopTrackingForeground(activity.getApplication());
 ```
 
 ## Use-case
 ```
-final MainActivity myContext = this;
-PredicIO.initialize(myContext, "9d5e3ecdeb4cdb7acfd63075ae046672");
-PredicIO.getInstance().setIdentity(myContext, "dev@predic.io");
-PredicIO.getInstance().checkOptIn(myContext, new HttpRequestResponseCallback() {
+final MainActivity myActivity = this;
+PredicIO.initialize(this, "9d5e3ecdeb4cdb7acfd63075ae046672");
+PredicIO.getInstance().setIdentity("dev@predic.io");
+PredicIO.getInstance().checkOptIn(new HttpRequestResponseCallback() {
   @Override
   public void onStringResponseSuccess(String response) {
     if(response.equals("KO")) {
       String title = "Privacy";
       String message = "Personalize your GDPR-compliant opt-in message here. For more details regarding GDPR please visit: https://www.eugdpr.org/";
-      PredicIO.getInstance().showOptIn(title,message,myContext,new HttpRequestResponseCallback() {
+      PredicIO.getInstance().showOptIn(title,message,myActivity,new HttpRequestResponseCallback() {
         @Override
         public void onStringResponseSuccess(String response) {
-          PredicIO.getInstance().setOptIn(myContext, null);
-          PredicIO.getInstance().startTrackingIdentity(myContext);
-          PredicIO.getInstance().startTrackingApps(myContext);
-          PredicIO.getInstance().startTrackingLocation(myContext);
-          PredicIO.getInstance().startTrackingForeground(myContext);
+          PredicIO.getInstance().setOptIn(null);
+          PredicIO.getInstance().startTrackingIdentity();
+          PredicIO.getInstance().startTrackingApps();
+          PredicIO.getInstance().startTrackingLocation(myActivity);
+          PredicIO.getInstance().startTrackingForeground(myActivity);
         }
         @Override
         public void onError(VolleyError e) {}
       });
     }
     else if(response.equals("OK")) {
-      PredicIO.getInstance().startTrackingIdentity(myContext);
-      PredicIO.getInstance().startTrackingApps(myContext);
-      PredicIO.getInstance().startTrackingLocation(myContext);
-      PredicIO.getInstance().startTrackingForeground(myContext);
+      PredicIO.getInstance().startTrackingIdentity();
+      PredicIO.getInstance().startTrackingApps();
+      PredicIO.getInstance().startTrackingLocation(myActivity);
+      PredicIO.getInstance().startTrackingForeground(myActivity);
     }
   }
   @Override
