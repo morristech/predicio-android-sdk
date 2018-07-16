@@ -35,7 +35,7 @@ Add this code to your app `build.gradle`:
 ```gradle
 dependencies {
   ...
-  compile 'com.github.team-predicio:android-sdk:2.0.9'
+  compile 'com.github.team-predicio:android-sdk:2.1.0'
   ...
 }
 ```
@@ -63,20 +63,20 @@ Predicio SDK gives you access to 3 different functions to manage consent easily:
 `checkOptIn` will check user consent regarding Predicio services:
 ```
 // PredicIO server will send "OK" if registered. "KO" if not registered.
-PredicIO.getInstance().checkOptIn(null);
+PredicIO.getInstance().checkOptIn(callback);
 ```
 
 `showOptIn` will display a customizable pop-up including `title` and `message` to request user opt-in.
 ```
-PredicIO.getInstance().showOptIn(title, message, activity, null);
+PredicIO.getInstance().showOptIn(title, message, activity, callback);
 ```
 
 `setOptIn` will save user consent regarding Predicio services. Users will be considered as opted-in.
 ```
-PredicIO.getInstance().setOptIn(null);
+PredicIO.getInstance().setOptIn(callback);
 ```
 
-To get the`checkOptIn` and `showOptIn` functions results, please use:
+To get the`checkOptIn` and `showOptIn` functions results, please use callback:
 ```
 public interface HttpRequestResponseCallback {
   void onStringResponseSuccess(String response);
