@@ -285,9 +285,10 @@ public class PredicIO {
         stopService(ACTION_TRACK_APPS);
     }
 
-    public void stopTrackingForeground(Application application) {
-        if(context == null || application == null) return;
-        application.unregisterActivityLifecycleCallbacks(appLifecycleManager);
+    public void stopTrackingForeground() {
+        if(context == null) return;
+        Application app = (Application) context;
+        app.unregisterActivityLifecycleCallbacks(appLifecycleManager);
         savePreference(ACTION_TRACK_FOREGROUND, "false");
     }
 
