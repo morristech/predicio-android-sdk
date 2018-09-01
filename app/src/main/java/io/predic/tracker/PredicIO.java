@@ -207,15 +207,17 @@ public class PredicIO {
         }
     }
 
-    public void startTrackingLocation(final Context context) {
-        startTrackingLocation(context, LOCATION_FINE);
+    public void startTrackingLocation() {
+        startTrackingLocation(LOCATION_FINE);
     }
 
-    public void startTrackingLocation(final Context context, String accuracyMethod) {
+    public void startTrackingLocation(String accuracyMethod) {
+        if(context == null) return;
+
         int permissionCheck = ContextCompat.checkSelfPermission(context, accuracyMethod);
         
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            startLocationServices(context);
+            startLocationServices();
         }
     }
 
