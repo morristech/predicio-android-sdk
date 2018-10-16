@@ -214,7 +214,9 @@ public class PredicIO {
     public void startTrackingLocation(String accuracyMethod) {
         if(context == null) return;
 
-        int permissionCheck = ContextCompat.checkSelfPermission(context, accuracyMethod);
+        setLocationAccuracy(accuracyMethod);
+
+        int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             startLocationServices();
